@@ -58,7 +58,7 @@ task runDragen {
     input {
         File read1
         File read2
-        String bwaRef
+        String dragenRef
         String prefix
         Boolean adapterTrim
         String Adapter1File=/.mounts/labs/gsiprojects/gsi/Dragen/resources/ADAPTER1
@@ -71,27 +71,24 @@ task runDragen {
     parameter_meta {
         read1: "Fastq file for read 1"
         read2: "Fastq file for read 2"
-        bwaRef: "The reference genome to align the sample with by Dragen"
+        dragenRef: "The reference genome to align the sample with by Dragen"
         adapterTrim: "True/False for adapter trimming"
         Adapter1File: "Adapters to be trimmed from Read1"
         Adapter2File: "Adapters to be trimmed from Read2"
         jobMemory: "Memory allocated for this job"
         timeout: "Hours before task timeout"
     }
-    
-    String resultBam = "~{basename(read1s)}.bam"
-
 
     command <<<
         set -euo pipefail
        dragen -f \
-       -r $REF_DIR \
-       -1 $R1 -2 $R2 \
+       -r ~{dragenRef} \
+       -1 $read1 -2 $read2 \
        ~{rgInfoString} \
        --enable-map-align true \
        --enable-map-align-output true \
        --output-directory $OUT_DIR \
-       --output-file-prefix $sm \
+       --output-file-prefix ~{prefix} \
        --read-trimmers adapter \
        --trim-adapter-read1 /.mounts/labs/gsiprojects/gsi/Dragen/ADAPTER1 \
        --trim-adapter-read2 /.mounts/labs/gsiprojects/gsi/Dragen/ADAPTER2 \
