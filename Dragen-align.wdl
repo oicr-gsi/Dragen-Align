@@ -1,6 +1,6 @@
 version 1.0
 
-workflow dragenSomaticVariantCaller {
+workflow dragenAlign {
     input {
         File fastqR1
         File fastqR2
@@ -29,7 +29,7 @@ workflow dragenSomaticVariantCaller {
                 input: 
                 read1 = fastqR1,
                 read2 = fastqR2,
-                dragenRef = drageRref,
+                dragenRef = dragenRref,
                 adapterTrim = adapterTrim,
                 prefix = outputFileNamePrefix,
                 rgInfoString = rgInfoString
@@ -42,8 +42,8 @@ workflow dragenSomaticVariantCaller {
         description: "This workflow will align a fastq pair to the reference seqeunce using Illumina Dragen.  Adapter trimming is optional.  The bam file will be sorted and indexed"
         dependencies: [
         {
-            name: "dragen/",
-            url: ""
+            name: "dragen",
+            url: "https://developer.illumina.com/dragen"
         }
       ]
     }
@@ -80,7 +80,7 @@ task runDragen {
     }
 
     command <<<
-        set -euo pipefail
+       set -euo pipefail
        dragen -f \
        -r ~{dragenRef} \
        -1 $read1 -2 $read2 \
@@ -99,14 +99,13 @@ task runDragen {
     >>>
 
     runtime {
-        memory:  "~{jobMemory} GB"
         timeout: "~{timeout}"
+        backend: "DRAGEN"
     }  
     
     output {
-        File outputBam = "~{resultBam}"
-        File outputBamIndex
-		WHAT OTHER FILES SHOULD BE PROVISIONED OUT
+        File outputBam = "~{prefix}.bam"
+        File outputBamIndex = "~{prefix}.bai"
     }
 
     meta {
