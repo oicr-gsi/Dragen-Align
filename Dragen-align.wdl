@@ -20,16 +20,16 @@ workflow dragenSomaticVariantCaller {
     }
 
     Map[String,String] dragenRef_by_genome = { 
-    "hg38": "/.mounts/labs/gsiprojects/gsi/Dragen/reference/hg38fa.v9"
+    "hg38": "/staging/data/references/hg38fa.v9"
     }
 
 
-    String bwaMem_ref = dragenRef_by_genome [ reference ]
+    String dragenRef = dragenRef_by_genome [ reference ]
     call runDragen  { 
                 input: 
                 read1 = fastqR1,
                 read2 = fastqR2,
-                bwaRef = bwaMem_ref,
+                dragenRef = drageRref,
                 adapterTrim = adapterTrim,
                 prefix = outputFileNamePrefix,
                 rgInfoString = rgInfoString
@@ -61,8 +61,8 @@ task runDragen {
         String dragenRef
         String prefix
         Boolean adapterTrim
-        String Adapter1File=/.mounts/labs/gsiprojects/gsi/Dragen/resources/ADAPTER1
-        String Adapter2File=/.mounts/labs/gsiprojects/gsi/Dragen/resources/ADAPTER2
+        String Adapter1File=/staging/data/resources/ADAPTER1
+        String Adapter2File=/staging/data/resources/ADAPTER2
         String rgInfoString
         Int jobMemory = 500
         Int timeout = 96
@@ -90,8 +90,8 @@ task runDragen {
        --output-directory $OUT_DIR \
        --output-file-prefix ~{prefix} \
        --read-trimmers adapter \
-       --trim-adapter-read1 /.mounts/labs/gsiprojects/gsi/Dragen/ADAPTER1 \
-       --trim-adapter-read2 /.mounts/labs/gsiprojects/gsi/Dragen/ADAPTER2 \
+       --trim-adapter-read1 ~{Adapter1File} \
+       --trim-adapter-read2 ~{Adapter2File) \
        --trim-min-length 1 \
        --enable-bam-indexing true \
        --enable-sort true \
