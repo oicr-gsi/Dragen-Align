@@ -51,6 +51,7 @@ workflow dragenAlign {
     output {
         File bam = runDragen.bam
         File bamIndex = runDragen.bamIndex
+        File metrics = runDragen.metrics
     }
 }
 
@@ -87,7 +88,7 @@ task runDragen {
        ~{rgInfoString} \
        --enable-map-align true \
        --enable-map-align-output true \
-       --output-directory $OUT_DIR \
+       --output-directory /staging/data/scratch \
        --output-file-prefix ~{prefix} \
        --read-trimmers adapter \
        --trim-adapter-read1 ~{Adapter1File} \
@@ -104,14 +105,16 @@ task runDragen {
     }  
     
     output {
-        File outputBam = "~{prefix}.bam"
-        File outputBamIndex = "~{prefix}.bai"
+        File bam = "~{prefix}.bam"
+        File bamIndex = "~{prefix}.bam.bai"
+	File metrics = "~{prefix}.mapping_metrics.csv"
     }
 
     meta {
         output_meta: {
-            outputBam: "output bam aligned to genome"
-            outputBamIndex: "index for the aligned bam"
+            bam: "output bam aligned to genome"
+            bamIndex: "index for the aligned bam"
+            metrics: "mapping metrics"
         }
     }
 
