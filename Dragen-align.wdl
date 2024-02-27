@@ -84,11 +84,11 @@ task runDragen {
       set -euo pipefail
       dragen -f \
       -r ~{dragenRef} \
-      -1 $read1 -2 $read2 \
+      -1 ~{read1} -2 ~{read2} \
       ~{rgInfoString} \
       --enable-map-align true \
       --enable-map-align-output true \
-      --output-directory /staging/data/scratch \
+      --output-directory ./ \
       --output-file-prefix ~{prefix} \
       --read-trimmers adapter \
       --trim-adapter-read1 ~{adapter1File} \
