@@ -9,15 +9,17 @@ workflow dragenAlign {
     String reference
     Boolean adapterTrim = true
     String rgInfoString = "--RGID 1"
+    String mode
   }
 
   parameter_meta {
-    fastqR1: "R1 of the fastq paired, gipped"
-    fastqR2: "R2 of the fastq pair, gzipped"
+    fastqR1: "Read 1 of the fastq paired, gzipped"
+    fastqR2: "Read 2 of the fastq pair, gzipped"
     outputFileNamePrefix: "Prefix for output files"
     reference: "The genome reference build. For example: hg19, hg38, mm10"
     adapterTrim: "Should adapters be trimmed"
-    rgInfoString: "space separated list of space separated key value pairs, possible keys are --RGID,--RGSM,--RGLB,--RGPU"
+    rgInfoString: "List of space separated key value pairs, possible keys are --RGID,--RGSM,--RGLB,--RGPU"
+    mode: "Specifies whether to complete genomic or transcriptomic analysis. Possible options are 'genome' or 'transcriptome'"
   }
 
   Map[String,String] dragenRef_by_genome = { 
@@ -39,7 +41,7 @@ workflow dragenAlign {
   meta {
     author: "Lawrence Heisler"
     email: "lheisler@oicr.on.ca"
-    description: "This workflow will align a fastq pair to the reference seqeunce using Illumina Dragen.  Adapter trimming is optional.  The bam file will be sorted and indexed"
+    description: "This workflow will align a fastq pair to the reference sequence using Illumina Dragen.  Adapter trimming is optional.  The bam file will be sorted and indexed"
     dependencies: [
       {
         name: "dragen",
@@ -96,7 +98,8 @@ task runDragen {
       --trim-min-length 1 \
       --enable-bam-indexing true \
       --enable-sort true \
-      --enable-duplicate-marking false
+      --enable-duplicate-marking false \
+      ~{if (mode == "transcriptome") then "--enable-rna true" else ""}
     >>>
 
     runtime {
@@ -112,13 +115,9 @@ task runDragen {
 
     meta {
       output_meta: {
-        bam: "output bam aligned to genome",
-        bamIndex: "index for the aligned bam",
-        metrics: "mapping metrics"
+        bam: "Output bam aligned to genome",
+        bamIndex: "Index for the aligned bam",
+        metrics: "Mapping metrics"
       }
     }
   }
-  
-
-
-
