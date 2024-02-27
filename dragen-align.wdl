@@ -17,7 +17,7 @@ workflow dragenAlign {
     fastqR2: "Read 2 of the fastq pair, gzipped"
     outputFileNamePrefix: "Prefix for output files"
     reference: "The genome reference build. For example: hg19, hg38, mm10"
-    adapterTrim: "Should adapters be trimmed"
+    adapterTrim: "Should adapters be trimmed, [true, trimmed]"
     rgInfoString: "List of space separated key value pairs, possible keys are --RGID,--RGSM,--RGLB,--RGPU"
     mode: "Specifies whether to complete genomic or transcriptomic analysis. Possible options are 'genome' or 'transcriptome'"
   }
