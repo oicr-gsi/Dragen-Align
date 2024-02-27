@@ -4,21 +4,21 @@ workflow dragenAlign {
 
   input {
     File fastqR1
-    File fastqR2
+    File? fastqR2
     String outputFileNamePrefix
     String reference
     Boolean adapterTrim = true
-    String rgInfoString = "--RGID 1"
+    String rgInfoString = "ID=1"
     String mode
   }
 
   parameter_meta {
-    fastqR1: "Read 1 of the fastq paired, gzipped"
+    fastqR1: "Read 1 of the fastq pair, gzipped"
     fastqR2: "Read 2 of the fastq pair, gzipped"
     outputFileNamePrefix: "Prefix for output files"
     reference: "The genome reference build. For example: hg19, hg38, mm10"
     adapterTrim: "Should adapters be trimmed, [true, trimmed]"
-    rgInfoString: "List of space separated key value pairs, possible keys are --RGID,--RGSM,--RGLB,--RGPU"
+    rgInfoString: "Comma separated list of key value pairs representing the read-group information, possible keys are (ID=, SM=, LB=, PU=, PL=, CN=, DS=, DT=, PI=)"
     mode: "Specifies whether to complete genomic or transcriptomic analysis. Possible options are 'genome' or 'transcriptome'"
   }
 
@@ -27,21 +27,28 @@ workflow dragenAlign {
   }
 
   String dragenRef = dragenRef_by_genome [ reference ]
-
-  call runDragen  { 
-    input: 
-    read1 = fastqR1,
-    read2 = fastqR2,
-    dragenRef = dragenRef,
-    adapterTrim = adapterTrim,
-    prefix = outputFileNamePrefix,
-    rgInfoString = rgInfoString
+  
+  # Validating the read-group information
+  call readGroupCheck {  
+      input: 
+      rgInfoString = rgInfoString 
   }
 
+  if (readGroupCheck.validReadGroups) {
+    call runDragen  { 
+      input: 
+      read1 = fastqR1,
+      read2 = fastqR2,
+      dragenRef = dragenRef,
+      adapterTrim = adapterTrim,
+      prefix = outputFileNamePrefix,
+      rgInfoString = rgInfoString
+    }
+  }
   meta {
-    author: "Lawrence Heisler"
-    email: "lheisler@oicr.on.ca"
-    description: "This workflow will align a fastq pair to the reference sequence using Illumina Dragen.  Adapter trimming is optional.  The bam file will be sorted and indexed"
+    author: "Lawrence Heisler and Muna Mohamed"
+    email: "lheisler@oicr.on.ca and mmohamed@oicr.on.ca"
+    description: "This workflow will align sequence data provided as fastq files to the reference sequence using Illumina Dragen.  Adapter trimming is optional.  The bam file will be sorted and indexed"
     dependencies: [
       {
         name: "dragen",
@@ -51,16 +58,71 @@ workflow dragenAlign {
   }
 
   output {
-    File bam = runDragen.bam
-    File bamIndex = runDragen.bamIndex
-    File metrics = runDragen.metrics
+    File? bam = runDragen.bam
+    File? bamIndex = runDragen.bamIndex
+    File? metrics = runDragen.metrics
   }
 }
+
+task readGroupCheck { 
+
+  input { 
+    String rgInfoString 
+    Int jobMemory = 1
+    Int timeout = 1 
+  } 
+
+  parameter_meta { 
+    rgInfoString: "The read-group information to be added into the bam file header" 
+    jobMemory: "Memory allocated for this job" 
+    timeout: "Hours before task timeout" 
+  } 
+  
+  command <<< 
+    set -euo pipefail 
+
+    fieldNames=("ID=" "LB=" "PL=" "PU=" "SM=" "CN=" "DS=" "DT=" "PI=") 
+    
+    # Split the string into an array 
+    IFS=, read -ra readFields <<< ~{rgInfoString}
+
+    for field in "${readFields[@]}"; do 
+        tag=${field:0:3}
+        validTag=false
+        for name in "${fieldNames[@]}"; do
+            if [ "$tag" == "$name" ]; then
+                validTag=true
+            fi
+        done 
+        if ! $validTag; then
+            # Redirect error message to stderr
+            echo "Invalid tag: '$tag'" >&2  
+            exit 1
+        fi
+    done 
+  >>> 
+
+  runtime { 
+      memory: "~{jobMemory} GB" 
+      timeout: "~{timeout}" 
+  } 
+
+  output { 
+      Boolean validReadGroups = true
+  } 
+
+  meta { 
+      output_meta: { 
+          validReadGroups: "Boolean specifying if the read-group information is valid" 
+      } 
+  }  
+
+} 
 
 task runDragen {
     input {
       File read1
-      File read2
+      File? read2
       String dragenRef
       String prefix
       Boolean adapterTrim
@@ -86,15 +148,16 @@ task runDragen {
       set -euo pipefail
       dragen -f \
       -r ~{dragenRef} \
-      -1 ~{read1} -2 ~{read2} \
+      -1 ~{read1} \
+      ~{if (defined(read2)) then "-2 ~{read2}" else ""} \
       ~{rgInfoString} \
       --enable-map-align true \
       --enable-map-align-output true \
       --output-directory ./ \
       --output-file-prefix ~{prefix} \
-      --read-trimmers adapter \
-      --trim-adapter-read1 ~{adapter1File} \
-      --trim-adapter-read2 ~{adapter2File} \
+      ~{if (adapterTrim) then "--read-trimmers adapter" +
+                              "--trim-adapter-read1 ~{adapter1File}" +
+                              "--trim-adapter-read2 ~{adapter2File}" else ""} \
       --trim-min-length 1 \
       --enable-bam-indexing true \
       --enable-sort true \
