@@ -108,10 +108,10 @@ task readGroupCheck {
 
     for key in "${!fieldsArray[@]}"; do
       value="${fieldsArray[$key]}"
-      readGroupString=+ " --" + "$key" + " " + "$value"
+      readGroupString+=" --${key} ${value}"
     done
 
-    readGroupFile < readGroupString
+    echo "$readGroupString" > readGroupFile
   >>> 
 
   runtime { 
@@ -150,8 +150,8 @@ task runDragen {
       dragenRef: "The reference genome to align the sample with by Dragen"
       prefix: "Prefix for output files"
       adapterTrim: "True/False for adapter trimming"
-      adapter1File: "Adapters to be trimmed from Read1"
-      adapter2File: "Adapters to be trimmed from Read2"
+      adapter1File: "Adapters to be trimmed from read 1"
+      adapter2File: "Adapters to be trimmed from read 2"
       rgInfoString: "Formatted string containing the validated read-group information"
       jobMemory: "Memory allocated for this job"
       timeout: "Hours before task timeout"
