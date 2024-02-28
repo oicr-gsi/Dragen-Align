@@ -58,9 +58,9 @@ workflow dragenAlign {
   }
 
   output {
-    File? bam = runDragen.bam
-    File? bamIndex = runDragen.bamIndex
-    File? metrics = runDragen.metrics
+    File bam = runDragen.bam
+    File bamIndex = runDragen.bamIndex
+    File metrics = runDragen.metrics
   }
 
 }
