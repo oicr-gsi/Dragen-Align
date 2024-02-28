@@ -18,7 +18,7 @@ workflow dragenAlign {
     outputFileNamePrefix: "Prefix for output files"
     reference: "The genome reference build. For example: hg19, hg38, mm10"
     adapterTrim: "Should adapters be trimmed, [true, trimmed]"
-    rgInfo: "Comma separated list of key value pairs representing the read-group information, possible keys are (ID=, SM=, LB=, PU=, PL=, CN=, DS=, DT=, PI=)"
+    rgInfo: "Comma separated list of key value pairs representing the read-group information, possible keys are (ID, SM, LB, PU, PL, CN, DS, DT, PI)"
     mode: "Specifies whether to complete genomic or transcriptomic analysis. Possible options are 'genome' or 'transcriptome'"
   }
 
