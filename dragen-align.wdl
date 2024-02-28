@@ -29,9 +29,9 @@ workflow dragenAlign {
   String dragenRef = dragenRef_by_genome [ reference ]
   
   # Validating the read-group information
-  call readGroupCheck {  
-      input: 
-      rgInfo = rgInfo
+  call readGroupFormat {  
+    input: 
+    rgInfo = rgInfo
   }
 
   call runDragen  { 
@@ -41,7 +41,8 @@ workflow dragenAlign {
     dragenRef = dragenRef,
     adapterTrim = adapterTrim,
     prefix = outputFileNamePrefix,
-    rgInfoString = readGroupCheck.rgInfoValid
+    mode = mode,
+    rgInfoString = readGroupFormat.rgInfoValid
   }
 
   meta {
@@ -61,14 +62,15 @@ workflow dragenAlign {
     File? bamIndex = runDragen.bamIndex
     File? metrics = runDragen.metrics
   }
+
 }
 
-task readGroupCheck { 
+task readGroupFormat { 
   input { 
     String rgInfo
     Int jobMemory = 1
-    Int timeout = 1 
-  } 
+    Int timeout = 5
+  }
 
   parameter_meta { 
     rgInfo: "The read-group information to be added into the bam file header" 
@@ -79,22 +81,22 @@ task readGroupCheck {
   command <<< 
     set -euo pipefail 
 
-    fieldNames=("ID" "LB" "PL" "PU" "SM" "CN" "DS" "DT" "PI") 
+    fieldNames=("ID=" "LB=" "PL=" "PU=" "SM=" "CN=" "DS=" "DT=" "PI=") 
 
-    # Split the string into an array of fields
+    # Split the string into an array of fields (key-value pairs)
     IFS=, read -ra rgArray <<< ~{rgInfo}
 
-    # Declares an associative array to append the values of the valid fields in rgArray
-      # If duplicate fields names are present, the most-right value will be used.
+    # Declares an associative array to append the values of the valid keys in rgArray
+      # If duplicate fields names are present, the right-most value will be used.
     declare -A fieldsArray
 
-    for field in "${rgArray[@]}"; do 
-      tag=${field:0:2}
+    for field in "${rgArray[@]}"; do
+      tag=${field:0:3}
       validTag=false
       for name in "${fieldNames[@]}"; do
         if [ "$tag" == "$name" ]; then
           validTag=true
-          fieldsArray[${"RG"+${tag}}]=${field:2:} 
+          fieldsArray[${field:0:2}]=$(echo "$field" | cut -d '=' -f2)
         fi
       done
       if ! $validTag; then
@@ -105,13 +107,11 @@ task readGroupCheck {
     done
 
     readGroupString=""
-
     for key in "${!fieldsArray[@]}"; do
-      value="${fieldsArray[$key]}"
-      readGroupString+=" --${key} ${value}"
+      readGroupString+=" --RG${key} ${fieldsArray[$key]}"
     done
 
-    echo "$readGroupString" > readGroupFile
+    echo "$readGroupString"
   >>> 
 
   runtime { 
@@ -120,7 +120,7 @@ task readGroupCheck {
   } 
 
   output { 
-    String rgInfoValid = read_string(readGroupFile)
+    String rgInfoValid = read_string(stdout())
   }
 
   meta { 
@@ -131,69 +131,75 @@ task readGroupCheck {
 } 
 
 task runDragen {
-    input {
-      File read1
-      File? read2
-      String dragenRef
-      String prefix
-      Boolean adapterTrim
-      String adapter1File = "/staging/data/resources/ADAPTER1"
-      String adapter2File = "/staging/data/resources/ADAPTER2"
-      String rgInfoString
-      Int jobMemory = 500
-      Int timeout = 96
-    }
+  input {
+    File read1
+    File? read2
+    String dragenRef
+    String prefix
+    String mode
+    Boolean adapterTrim
+    String adapter1File = "/staging/data/resources/ADAPTER1"
+    String adapter2File = "/staging/data/resources/ADAPTER2"
+    String rgInfoString
+    Int jobMemory = 500
+    Int timeout = 96
+  }
 
-    parameter_meta {
-      read1: "Fastq file for read 1"
-      read2: "Fastq file for read 2"
-      dragenRef: "The reference genome to align the sample with by Dragen"
-      prefix: "Prefix for output files"
-      adapterTrim: "True/False for adapter trimming"
-      adapter1File: "Adapters to be trimmed from read 1"
-      adapter2File: "Adapters to be trimmed from read 2"
-      rgInfoString: "Formatted string containing the validated read-group information"
-      jobMemory: "Memory allocated for this job"
-      timeout: "Hours before task timeout"
-    }
+  parameter_meta {
+    read1: "Fastq file for read 1"
+    read2: "Fastq file for read 2"
+    dragenRef: "The reference genome to align the sample with by Dragen"
+    prefix: "Prefix for output files"
+    mode: "Specifies whether to complete genomic or transcriptomic analysis. Possible options are 'genome' or 'transcriptome'"
+    adapterTrim: "True/False for adapter trimming"
+    adapter1File: "Adapters to be trimmed from read 1"
+    adapter2File: "Adapters to be trimmed from read 2"
+    rgInfoString: "Formatted string containing the validated read-group information"
+    jobMemory: "Memory allocated for this job"
+    timeout: "Hours before task timeout"
+  }
+  
+  # Boolean indicating whether to enable transcriptomic analysis
+  Boolean enableRNA = if mode == "transcriptome" then true else false
 
-    command <<<
-      set -euo pipefail
-      dragen -f \
-      -r ~{dragenRef} \
-      -1 ~{read1} \
-      ~{if (defined(read2)) then "-2 ~{read2}" else ""} \
-      ~{rgInfoString} \
-      --enable-map-align true \
-      --enable-map-align-output true \
-      --output-directory ./ \
-      --output-file-prefix ~{prefix} \
-      ~{if (adapterTrim) then "--read-trimmers adapter" +
-                              "--trim-adapter-read1 ~{adapter1File}" +
-                              "--trim-adapter-read2 ~{adapter2File}" else ""} \
-      --trim-min-length 1 \
-      --enable-bam-indexing true \
-      --enable-sort true \
-      --enable-duplicate-marking false \
-      ~{if (mode == "transcriptome") then "--enable-rna true" else ""}
-    >>>
+  command <<<
+    set -euo pipefail
 
-    runtime {
-      timeout: "~{timeout}"
-      backend: "DRAGEN"
-    }
-    
-    output {
-      File bam = "~{prefix}.bam"
-      File bamIndex = "~{prefix}.bam.bai"
-      File metrics = "~{prefix}.mapping_metrics.csv"
-    }
+    dragen -f \
+    -r ~{dragenRef} \
+    -1 ~{read1} \
+    ~{if (defined(read2)) then "-2 ~{read2}" else ""} \
+    ~{rgInfoString} \
+    --enable-map-align true \
+    --enable-map-align-output true \
+    --output-directory ./ \
+    --output-file-prefix ~{prefix} \
+    ~{if (adapterTrim) then "--read-trimmers adapter" +
+                            " --trim-adapter-read1 ~{adapter1File}" +
+                            " --trim-adapter-read2 ~{adapter2File}" else ""} \
+    --trim-min-length 1 \
+    --enable-bam-indexing true \
+    --enable-sort true \
+    --enable-duplicate-marking false \
+    --enable-rna ~{enableRNA}
+  >>>
 
-    meta {
-      output_meta: {
-        bam: "Output bam aligned to genome",
-        bamIndex: "Index for the aligned bam",
-        metrics: "Mapping metrics"
-      }
+  runtime {
+    timeout: "~{timeout}"
+    backend: "DRAGEN"
+  }
+  
+  output {
+    File bam = "~{prefix}.bam"
+    File bamIndex = "~{prefix}.bam.bai"
+    File metrics = "~{prefix}.mapping_metrics.csv"
+  }
+
+  meta {
+    output_meta: {
+      bam: "Output bam aligned to genome",
+      bamIndex: "Index for the aligned bam",
+      metrics: "Mapping metrics"
     }
   }
+}
