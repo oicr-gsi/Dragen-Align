@@ -547,7 +547,7 @@
             },     
             "dragenAlign.outputFileNamePrefix": "EPT105_A_", 
             "dragenAlign.reference": "hg38", 
-            "dragenAlign.adapterTrim": null, 
+            "dragenAlign.adapterTrim": false, 
             "dragenAlign.rgInfo": "ID=191025_NB551056_0121_AH7LW2BGXC,LB=TGL24_0115_Bn_U_PE_325_WT,SM=EPT105", 
             "dragenAlign.mode": "transcriptome",
             "dragenAlign.readGroupFormat.jobMemory": null, 
