@@ -48,7 +48,7 @@ workflow dragenAlign {
   meta {
     author: "Lawrence Heisler and Muna Mohamed"
     email: "lheisler@oicr.on.ca and mmohamed@oicr.on.ca"
-    description: "This workflow will align sequence data provided as fastq files to the reference sequence using Illumina Dragen.  Adapter trimming is optional.  The bam file will be sorted and indexed"
+    description: "This workflow will align sequence data provided as fastq files to the reference sequence using Illumina Dragen. Adapter trimming is optional. The bam file will be sorted and indexed"
     dependencies: [
       {
         name: "dragen",
@@ -60,7 +60,7 @@ workflow dragenAlign {
   output {
     File bam = runDragen.bam
     File bamIndex = runDragen.bamIndex
-    File metrics = runDragen.metrics
+    File zippedOut = runDragen.zippedOut
   }
 
 }
@@ -86,7 +86,7 @@ task readGroupFormat {
     # Split the string into an array of fields (key-value pairs)
     IFS=, read -ra rgArray <<< ~{rgInfo}
 
-    # Declares an associative array to append the values of the valid keys in rgArray
+    # Declares an associative array and appends the values of the valid keys in rgArray
       # If duplicate fields names are present, the right-most value will be used.
     declare -A fieldsArray
 
@@ -106,6 +106,7 @@ task readGroupFormat {
       fi
     done
 
+    # Outputs the read-group information in the proper format for Dragen
     readGroupString=""
     for key in "${!fieldsArray[@]}"; do
       readGroupString+=" --RG${key} ${fieldsArray[$key]}"
@@ -160,7 +161,7 @@ task runDragen {
   }
   
   # Boolean indicating whether to enable transcriptomic analysis
-  Boolean enableRNA = if mode == "transcriptome" then true else false
+  Boolean isRNA = if mode == "transcriptome" then true else false
 
   command <<<
     set -euo pipefail
@@ -181,7 +182,7 @@ task runDragen {
     --enable-bam-indexing true \
     --enable-sort true \
     --enable-duplicate-marking false \
-    --enable-rna ~{enableRNA}
+    --enable-rna ~{isRNA}
   >>>
 
   runtime {
@@ -192,14 +193,15 @@ task runDragen {
   output {
     File bam = "~{prefix}.bam"
     File bamIndex = "~{prefix}.bam.bai"
-    File metrics = "~{prefix}.mapping_metrics.csv"
+    # Must modify this section
+    File zippedOut = "~{prefix}.mapping_metrics.csv"
   }
 
   meta {
     output_meta: {
       bam: "Output bam aligned to genome",
       bamIndex: "Index for the aligned bam",
-      metrics: "Mapping metrics"
+      zippedOut: "Zipped file with the remaining outputs of Dragen"
     }
   }
 }
