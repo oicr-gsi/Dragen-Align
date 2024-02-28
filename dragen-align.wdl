@@ -8,7 +8,7 @@ workflow dragenAlign {
     String outputFileNamePrefix
     String reference
     Boolean adapterTrim = true
-    String rgInfoString = "ID=1"
+    String rgInfo = "ID=1"
     String mode
   }
 
@@ -18,7 +18,7 @@ workflow dragenAlign {
     outputFileNamePrefix: "Prefix for output files"
     reference: "The genome reference build. For example: hg19, hg38, mm10"
     adapterTrim: "Should adapters be trimmed, [true, trimmed]"
-    rgInfoString: "Comma separated list of key value pairs representing the read-group information, possible keys are (ID=, SM=, LB=, PU=, PL=, CN=, DS=, DT=, PI=)"
+    rgInfo: "Comma separated list of key value pairs representing the read-group information, possible keys are (ID=, SM=, LB=, PU=, PL=, CN=, DS=, DT=, PI=)"
     mode: "Specifies whether to complete genomic or transcriptomic analysis. Possible options are 'genome' or 'transcriptome'"
   }
 
@@ -31,20 +31,19 @@ workflow dragenAlign {
   # Validating the read-group information
   call readGroupCheck {  
       input: 
-      rgInfoString = rgInfoString 
+      rgInfo = rgInfo
   }
 
-  if (readGroupCheck.validReadGroups) {
-    call runDragen  { 
-      input: 
-      read1 = fastqR1,
-      read2 = fastqR2,
-      dragenRef = dragenRef,
-      adapterTrim = adapterTrim,
-      prefix = outputFileNamePrefix,
-      rgInfoString = rgInfoString
-    }
+  call runDragen  { 
+    input: 
+    read1 = fastqR1,
+    read2 = fastqR2,
+    dragenRef = dragenRef,
+    adapterTrim = adapterTrim,
+    prefix = outputFileNamePrefix,
+    rgInfoString = readGroupCheck.rgInfoValid
   }
+
   meta {
     author: "Lawrence Heisler and Muna Mohamed"
     email: "lheisler@oicr.on.ca and mmohamed@oicr.on.ca"
@@ -65,15 +64,14 @@ workflow dragenAlign {
 }
 
 task readGroupCheck { 
-
   input { 
-    String rgInfoString 
+    String rgInfo
     Int jobMemory = 1
     Int timeout = 1 
   } 
 
   parameter_meta { 
-    rgInfoString: "The read-group information to be added into the bam file header" 
+    rgInfo: "The read-group information to be added into the bam file header" 
     jobMemory: "Memory allocated for this job" 
     timeout: "Hours before task timeout" 
   } 
@@ -81,42 +79,55 @@ task readGroupCheck {
   command <<< 
     set -euo pipefail 
 
-    fieldNames=("ID=" "LB=" "PL=" "PU=" "SM=" "CN=" "DS=" "DT=" "PI=") 
-    
-    # Split the string into an array 
-    IFS=, read -ra readFields <<< ~{rgInfoString}
+    fieldNames=("ID" "LB" "PL" "PU" "SM" "CN" "DS" "DT" "PI") 
 
-    for field in "${readFields[@]}"; do 
-        tag=${field:0:3}
-        validTag=false
-        for name in "${fieldNames[@]}"; do
-            if [ "$tag" == "$name" ]; then
-                validTag=true
-            fi
-        done 
-        if ! $validTag; then
-            # Redirect error message to stderr
-            echo "Invalid tag: '$tag'" >&2  
-            exit 1
+    # Split the string into an array of fields
+    IFS=, read -ra rgArray <<< ~{rgInfo}
+
+    # Declares an associative array to append the values of the valid fields in rgArray
+      # If duplicate fields names are present, the most-right value will be used.
+    declare -A fieldsArray
+
+    for field in "${rgArray[@]}"; do 
+      tag=${field:0:2}
+      validTag=false
+      for name in "${fieldNames[@]}"; do
+        if [ "$tag" == "$name" ]; then
+          validTag=true
+          fieldsArray[${"RG"+${tag}}]=${field:2:} 
         fi
-    done 
+      done
+      if ! $validTag; then
+        # Redirect error message to stderr
+        echo "Invalid tag: '$tag'" >&2  
+        exit 1
+      fi
+    done
+
+    readGroupString=""
+
+    for key in "${!fieldsArray[@]}"; do
+      value="${fieldsArray[$key]}"
+      readGroupString=+ " --" + "$key" + " " + "$value"
+    done
+
+    readGroupFile < readGroupString
   >>> 
 
   runtime { 
-      memory: "~{jobMemory} GB" 
-      timeout: "~{timeout}" 
+    memory: "~{jobMemory} GB" 
+    timeout: "~{timeout}" 
   } 
 
   output { 
-      Boolean validReadGroups = true
-  } 
+    String rgInfoValid = read_string(readGroupFile)
+  }
 
   meta { 
-      output_meta: { 
-          validReadGroups: "Boolean specifying if the read-group information is valid" 
-      } 
-  }  
-
+    output_meta: { 
+      rgInfoValid: "Formatted string containing the validated read-group information" 
+    } 
+  } 
 } 
 
 task runDragen {
@@ -137,9 +148,11 @@ task runDragen {
       read1: "Fastq file for read 1"
       read2: "Fastq file for read 2"
       dragenRef: "The reference genome to align the sample with by Dragen"
+      prefix: "Prefix for output files"
       adapterTrim: "True/False for adapter trimming"
       adapter1File: "Adapters to be trimmed from Read1"
       adapter2File: "Adapters to be trimmed from Read2"
+      rgInfoString: "Formatted string containing the validated read-group information"
       jobMemory: "Memory allocated for this job"
       timeout: "Hours before task timeout"
     }
