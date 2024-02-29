@@ -162,6 +162,7 @@ task runDragen {
   
   # Boolean indicating whether to enable transcriptomic analysis
   Boolean isRNA = if mode == "transcriptome" then true else false
+  String zipFileName = "~{prefix}_alignment_outputs.zip"
 
   command <<<
     set -euo pipefail
@@ -183,6 +184,10 @@ task runDragen {
     --enable-sort true \
     --enable-duplicate-marking false \
     ~{if (isRNA) then "--enable-rna true" else ""}
+    
+    zip ~{zipFileName} $(ls | grep '~{prefix}.*.csv\|~{prefix}.*.tab' | tr '\n' ' ')
+
+    unzip -l ~{zipFileName}
   >>>
 
   runtime {
@@ -193,8 +198,7 @@ task runDragen {
   output {
     File bam = "~{prefix}.bam"
     File bamIndex = "~{prefix}.bam.bai"
-    # Must modify this section
-    File zippedOut = "~{prefix}.mapping_metrics.csv"
+    File zippedOut = "~{zipFileName}"
   }
 
   meta {
