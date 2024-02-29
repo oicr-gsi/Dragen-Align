@@ -1,6 +1,6 @@
 # dragenAlign
 
-This workflow will align sequence data provided as fastq files to the reference sequence using Illumina Dragen. Adapter trimming is optional. The bam file will be sorted and indexed
+This workflow will align sequence data (WG or WT) provided as fastq files to the reference sequence using Illumina Dragen. Adapter trimming is optional. The bam file will be sorted and indexed
 
 ## Overview
 
@@ -21,7 +21,7 @@ java -jar cromwell.jar run dragenAlign.wdl --inputs inputs.json
 #### Required workflow parameters:
 Parameter|Value|Description
 ---|---|---
-`fastqR1`|File|Read 1 of the fastq pair, gzipped
+`fastqR1`|File|Read 1, gzipped
 `outputFileNamePrefix`|String|Prefix for output files
 `reference`|String|The genome reference build. For example: hg19, hg38, mm10
 `mode`|String|Specifies whether to complete genomic or transcriptomic analysis. Possible options are 'genome' or 'transcriptome'
@@ -30,9 +30,9 @@ Parameter|Value|Description
 #### Optional workflow parameters:
 Parameter|Value|Default|Description
 ---|---|---|---
-`fastqR2`|File?|None|Read 2 of the fastq pair, gzipped
+`fastqR2`|File?|None|Read 2 for paired-end reads, gzipped
 `adapterTrim`|Boolean|true|Should adapters be trimmed, [true, trimmed]
-`rgInfo`|String|"ID=1"|Comma separated list of key value pairs representing the read-group information, possible keys are (ID=, SM=, LB=, PU=, PL=, CN=, DS=, DT=, PI=)
+`rgInfo`|String|"ID=1"|Comma separated list of key value pairs representing the read-group information, possible keys are (ID, SM, LB, PU, PL, CN, DS, DT, PI)
 
 
 #### Optional task parameters:

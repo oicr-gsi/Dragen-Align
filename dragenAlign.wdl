@@ -13,8 +13,8 @@ workflow dragenAlign {
   }
 
   parameter_meta {
-    fastqR1: "Read 1 of the fastq pair, gzipped"
-    fastqR2: "Read 2 of the fastq pair, gzipped"
+    fastqR1: "Read 1, gzipped"
+    fastqR2: "Read 2 for paired-end reads, gzipped"
     outputFileNamePrefix: "Prefix for output files"
     reference: "The genome reference build. For example: hg19, hg38, mm10"
     adapterTrim: "Should adapters be trimmed, [true, trimmed]"
@@ -48,7 +48,7 @@ workflow dragenAlign {
   meta {
     author: "Lawrence Heisler and Muna Mohamed"
     email: "lheisler@oicr.on.ca and mmohamed@oicr.on.ca"
-    description: "This workflow will align sequence data provided as fastq files to the reference sequence using Illumina Dragen. Adapter trimming is optional. The bam file will be sorted and indexed"
+    description: "This workflow will align sequence data (WG or WT) provided as fastq files to the reference sequence using Illumina Dragen. Adapter trimming is optional. The bam file will be sorted and indexed"
     dependencies: [
       {
         name: "dragen",
@@ -182,7 +182,7 @@ task runDragen {
     --enable-bam-indexing true \
     --enable-sort true \
     --enable-duplicate-marking false \
-    --enable-rna ~{isRNA}
+    ~{if (isRNA) then "--enable-rna true" else ""}
   >>>
 
   runtime {
