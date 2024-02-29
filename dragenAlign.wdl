@@ -22,11 +22,15 @@ workflow dragenAlign {
     mode: "Specifies whether to complete genomic or transcriptomic analysis. Possible options are 'genome' or 'transcriptome'"
   }
 
-  Map[String,String] dragenRef_by_genome = { 
+  Map[String,String] dragenRef_wg_by_genome = { 
+    "hg38": "/staging/data/references/hg38fa.v9"
+  }
+  
+  Map[String,String] dragenRef_wt_by_genome = { 
     "hg38": "/staging/data/references/hg38fa.v9"
   }
 
-  String dragenRef = dragenRef_by_genome [ reference ]
+  String dragenRef = if mode == "transcriptome" then dragenRef_wt_by_genome[reference] else dragenRef_wg_by_genome[reference]
   
   # Validating the read-group information
   call readGroupFormat {  
@@ -163,7 +167,7 @@ task runDragen {
   # Boolean indicating whether to enable transcriptomic analysis
   Boolean isRNA = if mode == "transcriptome" then true else false
   
-  tring zipFileName = "~{prefix}_alignment_outputs.zip"
+  String zipFileName = "~{prefix}_alignment_outputs.zip"
 
   command <<<
     set -euo pipefail
