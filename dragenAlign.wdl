@@ -22,15 +22,11 @@ workflow dragenAlign {
     mode: "Specifies whether to complete genomic or transcriptomic analysis. Possible options are 'genome' or 'transcriptome'"
   }
 
-  Map[String,String] dragenRef_wg_by_genome = { 
-    "hg38": "/staging/data/references/hg38fa.v9"
-  }
-  
-  Map[String,String] dragenRef_wt_by_genome = { 
+  Map[String,String] dragenRef_by_genome = { 
     "hg38": "/staging/data/references/hg38fa.v9"
   }
 
-  String dragenRef = if mode == "transcriptome" then dragenRef_wt_by_genome[reference] else dragenRef_wg_by_genome[reference]
+  String dragenRef = dragenRef_by_genome[reference]
   
   # Validating the read-group information
   call readGroupFormat {  
@@ -65,6 +61,7 @@ workflow dragenAlign {
     File bam = runDragen.bam
     File bamIndex = runDragen.bamIndex
     File zippedOut = runDragen.zippedOut
+    File? outputChimeric = runDragen.outputChimeric
   }
 
 }
@@ -202,13 +199,15 @@ task runDragen {
     File bam = "~{prefix}.bam"
     File bamIndex = "~{prefix}.bam.bai"
     File zippedOut = "~{zipFileName}"
+    File? outputChimeric = "~{prefix}.Chimeric.out.junction"
   }
 
   meta {
     output_meta: {
       bam: "Output bam aligned to genome",
       bamIndex: "Index for the aligned bam",
-      zippedOut: "Zipped file with the remaining outputs of Dragen"
+      zippedOut: "Zip file containing the supporting .csv and .tab outputs from Dragen"
+      outputChimeric: "Output chimeric junctions file, if available"
     }
   }
 }
