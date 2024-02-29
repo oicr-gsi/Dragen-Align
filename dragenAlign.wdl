@@ -206,7 +206,7 @@ task runDragen {
     output_meta: {
       bam: "Output bam aligned to genome",
       bamIndex: "Index for the aligned bam",
-      zippedOut: "Zip file containing the supporting .csv and .tab outputs from Dragen"
+      zippedOut: "Zip file containing the supporting .csv and .tab outputs from Dragen",
       outputChimeric: "Output chimeric junctions file, if available"
     }
   }
