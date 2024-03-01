@@ -63,5 +63,7 @@ This section lists command(s) run by dragenAlign workflow
     --enable-bam-indexing true \
     --enable-sort true \
     --enable-duplicate-marking false \
-    --enable-rna ~{isRNA}
+    ~{if (isRNA) then "--enable-rna true" else ""}
+    
+    zip -m ~{zipFileName} $(ls | grep '~{prefix}.*.csv\|~{prefix}.*.tab' | tr '\n' ' ')
 ```

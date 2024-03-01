@@ -52,7 +52,8 @@ Output | Type | Description
 ---|---|---
 `bam`|File|Output bam aligned to genome
 `bamIndex`|File|Index for the aligned bam
-`zippedOut`|File|Zipped file with the remaining outputs of Dragen
+`zippedOut`|File|Zip file containing the supporting .csv and .tab outputs from Dragen
+`outputChimeric`|File?|Output chimeric junctions file, if available
 
 
 ## Commands
@@ -120,7 +121,9 @@ Output | Type | Description
      --enable-bam-indexing true \
      --enable-sort true \
      --enable-duplicate-marking false \
-     --enable-rna ~{isRNA}
+     ~{if (isRNA) then "--enable-rna true" else ""}
+     
+     zip -m ~{zipFileName} $(ls | grep '~{prefix}.*.csv\|~{prefix}.*.tab' | tr '\n' ' ')
  ```
  ## Support
 
