@@ -60,6 +60,14 @@
                 ],
                 "type": "ALL"
             },
+            "dragenAlign.outputChimeric": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_PCSI0022C_notrim_bam_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
             "dragenAlign.zippedOut": {
                 "contents": [
                     {
@@ -139,6 +147,14 @@
                 ],
                 "type": "ALL"
             },
+            "dragenAlign.outputChimeric": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_PCSI0022C_trim_bam_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
             "dragenAlign.zippedOut": {
                 "contents": [
                     {
@@ -207,6 +223,14 @@
                 ],
                 "type": "ALL"
             },
+            "dragenAlign.outputChimeric": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_PCSI0022C_trim_bam_se_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
             "dragenAlign.zippedOut": {
                 "contents": [
                     {
@@ -268,6 +292,14 @@
                 "type": "ALL"
             },
             "dragenAlign.bamIndex": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_PCSI0022C_notrim_bam_se_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.outputChimeric": {
                 "contents": [
                     {
                         "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_PCSI0022C_notrim_bam_se_@JENKINSID@"
@@ -354,6 +386,14 @@
                 ],
                 "type": "ALL"
             },
+            "dragenAlign.outputChimeric": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_K562_notrim_wt_bam_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
             "dragenAlign.zippedOut": {
                 "contents": [
                     {
@@ -433,6 +473,14 @@
                 ],
                 "type": "ALL"
             },
+            "dragenAlign.outputChimeric": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_K562_trim_wt_bam_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
             "dragenAlign.zippedOut": {
                 "contents": [
                     {
@@ -494,6 +542,14 @@
                 "type": "ALL"
             },
             "dragenAlign.bamIndex": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_K562_notrim_wt_bam_se_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.outputChimeric": {
                 "contents": [
                     {
                         "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_K562_notrim_wt_bam_se_@JENKINSID@"
@@ -580,6 +636,14 @@
                 ],
                 "type": "ALL"
             },
+            "dragenAlign.outputChimeric": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_EPT105_A_notrim_wt_bam_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
             "dragenAlign.zippedOut": {
                 "contents": [
                     {
@@ -641,6 +705,14 @@
                 "type": "ALL"
             },
             "dragenAlign.bamIndex": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_EPT105_B_trim_wt_bam_se_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.outputChimeric": {
                 "contents": [
                     {
                         "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_EPT105_B_trim_wt_bam_se_@JENKINSID@"
