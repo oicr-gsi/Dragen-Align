@@ -1,0 +1,741 @@
+[
+    {
+        "arguments": {
+            "dragenAlign.fastqR1": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/dragenAlign/input_data/PCSI0022C.val.1.fastq.gz",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "dragenAlign.fastqR2": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/dragenAlign/input_data/PCSI0022C.val.2.fastq.gz",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "dragenAlign.outputFileNamePrefix": "121005_h804_0096_AD0V4NACXX_PCSI0022C_NoIndex_L006_001", 
+            "dragenAlign.reference": "hg38", 
+            "dragenAlign.adapterTrim": false, 
+            "dragenAlign.rgInfo": "ID=121005_h804_0096_AD0V4NACXX-NoIndex_6,LB=PCSI0022C,PL=ILLUMINA,PU=121005_h804_0096_AD0V4NACXX-NoIndex_6,SM=PCSI0022C", 
+            "dragenAlign.mode": "genome",
+            "dragenAlign.readGroupFormat.jobMemory": null, 
+            "dragenAlign.readGroupFormat.timeout": null, 
+            "dragenAlign.runDragen.adapter1File": null, 
+            "dragenAlign.runDragen.adapter2File": null, 
+            "dragenAlign.runDragen.jobMemory": null, 
+            "dragenAlign.runDragen.timeout": null
+        },
+        "description": "Runs the small PCSI_0022 C data without trimming, and outputs as BAM.",
+        "engineArguments": {
+            "write_to_cache": false,
+            "read_from_cache": false
+        },
+        "id": "PCSI0022C_notrim_bam",
+        "metadata": {
+            "dragenAlign.bam": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_PCSI0022C_notrim_bam_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.bamIndex": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_PCSI0022C_notrim_bam_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.outputChimeric": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_PCSI0022C_notrim_bam_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.zippedOut": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_PCSI0022C_notrim_bam_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            }
+        },
+        "validators": [
+            {
+                "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
+                "metrics_compare": "@CHECKOUT@/tests/compare.sh",
+                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.0.0/output_metrics/PCSI0022C_notrim_bam.metrics",
+                "type": "script"
+            }
+        ]
+    },
+    {
+        "arguments": {
+            "dragenAlign.fastqR1": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/dragenAlign/input_data/PCSI0022C.val.1.fastq.gz",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "dragenAlign.fastqR2": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/dragenAlign/input_data/PCSI0022C.val.2.fastq.gz",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "dragenAlign.outputFileNamePrefix": "121005_h804_0096_AD0V4NACXX_PCSI0022C_NoIndex_L006_001", 
+            "dragenAlign.reference": "hg38", 
+            "dragenAlign.adapterTrim": null, 
+            "dragenAlign.rgInfo": "ID=121005_h804_0096_AD0V4NACXX-NoIndex_6,LB=PCSI0022C,PL=ILLUMINA,PU=121005_h804_0096_AD0V4NACXX-NoIndex_6,SM=PCSI0022C", 
+            "dragenAlign.mode": "genome",
+            "dragenAlign.readGroupFormat.jobMemory": null, 
+            "dragenAlign.readGroupFormat.timeout": null, 
+            "dragenAlign.runDragen.adapter1File": null, 
+            "dragenAlign.runDragen.adapter2File": null, 
+            "dragenAlign.runDragen.jobMemory": null, 
+            "dragenAlign.runDragen.timeout": null
+        },
+        "description": "Runs the small PCSI_0022 C data with trimming, and outputs as BAM.",
+        "engineArguments": {
+            "write_to_cache": false,
+            "read_from_cache": false
+        },
+        "id": "PCSI0022C_trim_bam",
+        "metadata": {
+            "dragenAlign.bam": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_PCSI0022C_trim_bam_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.bamIndex": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_PCSI0022C_trim_bam_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.outputChimeric": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_PCSI0022C_trim_bam_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.zippedOut": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_PCSI0022C_trim_bam_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            }
+        },
+        "validators": [
+            {
+                "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
+                "metrics_compare": "@CHECKOUT@/tests/compare.sh",
+                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.0.0/output_metrics/PCSI0022C_trim_bam.metrics",
+                "type": "script"
+            }
+        ]
+    },
+    {
+        "arguments": {
+            "dragenAlign.fastqR1": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/dragenAlign/input_data/PCSI0022C.val.1.fastq.gz",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "dragenAlign.fastqR2": null,
+            "dragenAlign.outputFileNamePrefix": "121005_h804_0096_AD0V4NACXX_PCSI0022C_NoIndex_L006_001", 
+            "dragenAlign.reference": "hg38", 
+            "dragenAlign.adapterTrim": null, 
+            "dragenAlign.rgInfo": "ID=121005_h804_0096_AD0V4NACXX-NoIndex_6,LB=PCSI0022C,PL=ILLUMINA,PU=121005_h804_0096_AD0V4NACXX-NoIndex_6,SM=PCSI0022C", 
+            "dragenAlign.mode": "genome",
+            "dragenAlign.readGroupFormat.jobMemory": null, 
+            "dragenAlign.readGroupFormat.timeout": null, 
+            "dragenAlign.runDragen.adapter1File": null, 
+            "dragenAlign.runDragen.adapter2File": null, 
+            "dragenAlign.runDragen.jobMemory": null, 
+            "dragenAlign.runDragen.timeout": null
+        },
+        "description": "Runs the small PCSI_0022 C data with trimming, single ended, and outputs as BAM.",
+        "engineArguments": {
+            "write_to_cache": false,
+            "read_from_cache": false
+        },
+        "id": "PCSI0022C_trim_bam_se",
+        "metadata": {
+            "dragenAlign.bam": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_PCSI0022C_trim_bam_se_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.bamIndex": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_PCSI0022C_trim_bam_se_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.outputChimeric": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_PCSI0022C_trim_bam_se_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.zippedOut": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_PCSI0022C_trim_bam_se_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            }
+        },
+        "validators": [
+            {
+                "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
+                "metrics_compare": "@CHECKOUT@/tests/compare.sh",
+                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.0.0/output_metrics/PCSI0022C_trim_bam_se.metrics",
+                "type": "script"
+            }
+        ]
+    },
+    {
+        "arguments": {
+            "dragenAlign.fastqR1": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/dragenAlign/input_data/PCSI0022C.val.1.fastq.gz",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "dragenAlign.fastqR2": null,
+            "dragenAlign.outputFileNamePrefix": "121005_h804_0096_AD0V4NACXX_PCSI0022C_NoIndex_L006_001", 
+            "dragenAlign.reference": "hg38", 
+            "dragenAlign.adapterTrim": false, 
+            "dragenAlign.rgInfo": "ID=121005_h804_0096_AD0V4NACXX-NoIndex_6,LB=PCSI0022C,PL=ILLUMINA,PU=121005_h804_0096_AD0V4NACXX-NoIndex_6,SM=PCSI0022C", 
+            "dragenAlign.mode": "genome",
+            "dragenAlign.readGroupFormat.jobMemory": null, 
+            "dragenAlign.readGroupFormat.timeout": null, 
+            "dragenAlign.runDragen.adapter1File": null, 
+            "dragenAlign.runDragen.adapter2File": null, 
+            "dragenAlign.runDragen.jobMemory": null, 
+            "dragenAlign.runDragen.timeout": null
+        },
+        "description": "Runs the small PCSI_0022 C data without trimming, single ended, and outputs as BAM.",
+        "engineArguments": {
+            "write_to_cache": false,
+            "read_from_cache": false
+        },
+        "id": "PCSI0022C_notrim_bam_se",
+        "metadata": {
+            "dragenAlign.bam": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_PCSI0022C_notrim_bam_se_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.bamIndex": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_PCSI0022C_notrim_bam_se_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.outputChimeric": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_PCSI0022C_notrim_bam_se_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.zippedOut": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_PCSI0022C_notrim_bam_se_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            }
+        },
+        "validators": [
+            {
+                "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
+                "metrics_compare": "@CHECKOUT@/tests/compare.sh",
+                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.0.0/output_metrics/PCSI0022C_notrim_bam_se.metrics",
+                "type": "script"
+            }
+        ]
+    },
+    {
+        "arguments": {
+            "dragenAlign.fastqR1": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/dragenAlign/input_data/k562_NoIndex_L001_R1_001.fastq.gz",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "dragenAlign.fastqR2": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/dragenAlign/input_data/k562_NoIndex_L001_R2_001.fastq.gz",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "dragenAlign.outputFileNamePrefix": "K562", 
+            "dragenAlign.reference": "hg38", 
+            "dragenAlign.adapterTrim": false, 
+            "dragenAlign.rgInfo": "ID=121005_h804_0096_AD0V4NACXX_4_NoIndex,PL=Illumina,PU=121005_h804_0096_AD0V4NACXX_4_NoIndex,LB=K562_1,SM=K562_1test", 
+            "dragenAlign.mode": "transcriptome",
+            "dragenAlign.readGroupFormat.jobMemory": null, 
+            "dragenAlign.readGroupFormat.timeout": null, 
+            "dragenAlign.runDragen.adapter1File": null, 
+            "dragenAlign.runDragen.adapter2File": null, 
+            "dragenAlign.runDragen.jobMemory": null, 
+            "dragenAlign.runDragen.timeout": null
+        },
+        "description": "Runs the K562 data (WT) without trimming, and outputs as BAM.",
+        "engineArguments": {
+            "write_to_cache": false,
+            "read_from_cache": false
+        },
+        "id": "K562_notrim_wt_bam",
+        "metadata": {
+            "dragenAlign.bam": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_K562_notrim_wt_bam_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.bamIndex": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_K562_notrim_wt_bam_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.outputChimeric": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_K562_notrim_wt_bam_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.zippedOut": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_K562_notrim_wt_bam_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            }
+        },
+        "validators": [
+            {
+                "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
+                "metrics_compare": "@CHECKOUT@/tests/compare.sh",
+                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.0.0/output_metrics/K562_notrim_wt_bam.metrics",
+                "type": "script"
+            }
+        ]
+    },
+    {
+        "arguments": {
+            "dragenAlign.fastqR1": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/dragenAlign/input_data/k562_NoIndex_L001_R1_001.fastq.gz",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "dragenAlign.fastqR2": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/dragenAlign/input_data/k562_NoIndex_L001_R2_001.fastq.gz",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "dragenAlign.outputFileNamePrefix": "K562", 
+            "dragenAlign.reference": "hg38", 
+            "dragenAlign.adapterTrim": null, 
+            "dragenAlign.rgInfo": "ID=121005_h804_0096_AD0V4NACXX_4_NoIndex,PL=Illumina,PU=121005_h804_0096_AD0V4NACXX_4_NoIndex,LB=K562_1,SM=K562_1test", 
+            "dragenAlign.mode": "transcriptome",
+            "dragenAlign.readGroupFormat.jobMemory": null, 
+            "dragenAlign.readGroupFormat.timeout": null, 
+            "dragenAlign.runDragen.adapter1File": null, 
+            "dragenAlign.runDragen.adapter2File": null, 
+            "dragenAlign.runDragen.jobMemory": null, 
+            "dragenAlign.runDragen.timeout": null
+        },
+        "description": "Runs the K562 data (WT) with trimming, and outputs as BAM.",
+        "engineArguments": {
+            "write_to_cache": false,
+            "read_from_cache": false
+        },
+        "id": "K562_trim_wt_bam",
+        "metadata": {
+            "dragenAlign.bam": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_K562_trim_wt_bam_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.bamIndex": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_K562_trim_wt_bam_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.outputChimeric": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_K562_trim_wt_bam_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.zippedOut": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_K562_trim_wt_bam_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            }
+        },
+        "validators": [
+            {
+                "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
+                "metrics_compare": "@CHECKOUT@/tests/compare.sh",
+                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.0.0/output_metrics/K562_trim_wt_bam.metrics",
+                "type": "script"
+            }
+        ]
+    },
+    {
+        "arguments": {
+            "dragenAlign.fastqR1": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/dragenAlign/input_data/k562_NoIndex_L001_R1_001.fastq.gz",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "dragenAlign.fastqR2": null,
+            "dragenAlign.outputFileNamePrefix": "K562", 
+            "dragenAlign.reference": "hg38", 
+            "dragenAlign.adapterTrim": false, 
+            "dragenAlign.rgInfo": "ID=121005_h804_0096_AD0V4NACXX_4_NoIndex,PL=Illumina,PU=121005_h804_0096_AD0V4NACXX_4_NoIndex,LB=K562_1,SM=K562_1test", 
+            "dragenAlign.mode": "transcriptome",
+            "dragenAlign.readGroupFormat.jobMemory": null, 
+            "dragenAlign.readGroupFormat.timeout": null, 
+            "dragenAlign.runDragen.adapter1File": null, 
+            "dragenAlign.runDragen.adapter2File": null, 
+            "dragenAlign.runDragen.jobMemory": null, 
+            "dragenAlign.runDragen.timeout": null
+        },
+        "description": "Runs the K562 data (WT) without trimming, single ended and outputs as BAM.",
+        "engineArguments": {
+            "write_to_cache": false,
+            "read_from_cache": false
+        },
+        "id": "K562_notrim_wt_bam_se",
+        "metadata": {
+            "dragenAlign.bam": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_K562_notrim_wt_bam_se_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.bamIndex": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_K562_notrim_wt_bam_se_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.outputChimeric": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_K562_notrim_wt_bam_se_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.zippedOut": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_K562_notrim_wt_bam_se_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            }
+        },
+        "validators": [
+            {
+                "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
+                "metrics_compare": "@CHECKOUT@/tests/compare.sh",
+                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.0.0/output_metrics/K562_notrim_wt_bam_se.metrics",
+                "type": "script"
+            }
+        ]
+    },
+    {
+        "arguments": {
+            "dragenAlign.fastqR1": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/dragenAlign/input_data/EPT105_A_R1_001.fastq.gz",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "dragenAlign.fastqR2": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/dragenAlign/input_data/EPT105_A_R2_001.fastq.gz",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },     
+            "dragenAlign.outputFileNamePrefix": "EPT105_A_", 
+            "dragenAlign.reference": "hg38", 
+            "dragenAlign.adapterTrim": false, 
+            "dragenAlign.rgInfo": "ID=191025_NB551056_0121_AH7LW2BGXC,LB=TGL24_0115_Bn_U_PE_325_WT,SM=EPT105", 
+            "dragenAlign.mode": "transcriptome",
+            "dragenAlign.readGroupFormat.jobMemory": null, 
+            "dragenAlign.readGroupFormat.timeout": null, 
+            "dragenAlign.runDragen.adapter1File": null, 
+            "dragenAlign.runDragen.adapter2File": null, 
+            "dragenAlign.runDragen.jobMemory": null, 
+            "dragenAlign.runDragen.timeout": null
+        },
+        "description": "Runs the EPT105_A data (WT) without trimming, and outputs as BAM.",
+        "engineArguments": {
+            "write_to_cache": false,
+            "read_from_cache": false
+        },
+        "id": "EPT105_A_notrim_wt_bam",
+        "metadata": {
+            "dragenAlign.bam": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_EPT105_A_notrim_wt_bam_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.bamIndex": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_EPT105_A_notrim_wt_bam_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.outputChimeric": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_EPT105_A_notrim_wt_bam_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.zippedOut": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_EPT105_A_notrim_wt_bam_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            }
+        },
+        "validators": [
+            {
+                "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
+                "metrics_compare": "@CHECKOUT@/tests/compare.sh",
+                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.0.0/output_metrics/EPT105_A_notrim_wt_bam.metrics",
+                "type": "script"
+            }
+        ]
+    },
+    {
+        "arguments": {
+            "dragenAlign.fastqR1": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/dragenAlign/input_data/EPT105_B_R1_001.fastq.gz",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "dragenAlign.fastqR2": null,
+            "dragenAlign.outputFileNamePrefix": "EPT105_B_", 
+            "dragenAlign.reference": "hg38",
+            "dragenAlign.adapterTrim": null,
+            "dragenAlign.rgInfo": "ID=191126_NB551056_0130_AHTMW5BGXC,LB=TGL24_0115_Bn_U_PE_325_WT,SM=EPT105", 
+            "dragenAlign.mode": "transcriptome",
+            "dragenAlign.readGroupFormat.jobMemory": null, 
+            "dragenAlign.readGroupFormat.timeout": null, 
+            "dragenAlign.runDragen.adapter1File": null, 
+            "dragenAlign.runDragen.adapter2File": null, 
+            "dragenAlign.runDragen.jobMemory": null, 
+            "dragenAlign.runDragen.timeout": null
+        },
+        "description": "Runs the EPT105_B data (WT) with trimming, single ended, and outputs as BAM.",
+        "engineArguments": {
+            "write_to_cache": false,
+            "read_from_cache": false
+        },
+        "id": "EPT105_B_trim_wt_bam_se",
+        "metadata": {
+            "dragenAlign.bam": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_EPT105_B_trim_wt_bam_se_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.bamIndex": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_EPT105_B_trim_wt_bam_se_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.outputChimeric": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_EPT105_B_trim_wt_bam_se_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "dragenAlign.zippedOut": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_dragenAlign_EPT105_B_trim_wt_bam_se_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            }
+        },
+        "validators": [
+            {
+                "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
+                "metrics_compare": "@CHECKOUT@/tests/compare.sh",
+                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.0.0/output_metrics/EPT105_B_trim_wt_bam_se.metrics",
+                "type": "script"
+            }
+        ]
+    }
+]

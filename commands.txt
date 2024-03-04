@@ -1,0 +1,69 @@
+## Commands
+This section lists command(s) run by dragenAlign workflow
+
+* Running dragenAlign
+
+=== Ensures the read-group information is valid, and outputs it in the correct format ===.
+
+``` 
+    set -euo pipefail 
+
+    fieldNames=("ID=" "LB=" "PL=" "PU=" "SM=" "CN=" "DS=" "DT=" "PI=") 
+
+    # Split the string into an array of fields (key-value pairs)
+    IFS=, read -ra rgArray <<< ~{rgInfo}
+
+    # Declares an associative array and appends the values of the valid keys in rgArray
+      # If duplicate fields names are present, the right-most value will be used.
+    declare -A fieldsArray
+
+    for field in "${rgArray[@]}"; do
+      tag=${field:0:3}
+      validTag=false
+      for name in "${fieldNames[@]}"; do
+        if [ "$tag" == "$name" ]; then
+          validTag=true
+          fieldsArray[${field:0:2}]=$(echo "$field" | cut -d '=' -f2)
+        fi
+      done
+      if ! $validTag; then
+        # Redirect error message to stderr
+        echo "Invalid tag: '$tag'" >&2  
+        exit 1
+      fi
+    done
+
+    # Outputs the read-group information in the proper format for Dragen
+    readGroupString=""
+    for key in "${!fieldsArray[@]}"; do
+      readGroupString+=" --RG${key} ${fieldsArray[$key]}"
+    done
+
+    echo "$readGroupString"
+```
+
+=== Align to reference using Dragen ===.
+
+```
+    set -euo pipefail
+
+    dragen -f \
+    -r ~{dragenRef} \
+    -1 ~{read1} \
+    ~{if (defined(read2)) then "-2 ~{read2}" else ""} \
+    ~{rgInfoString} \
+    --enable-map-align true \
+    --enable-map-align-output true \
+    --output-directory ./ \
+    --output-file-prefix ~{prefix} \
+    ~{if (adapterTrim) then "--read-trimmers adapter" +
+                            " --trim-adapter-read1 ~{adapter1File}" +
+                            " --trim-adapter-read2 ~{adapter2File}" else ""} \
+    --trim-min-length 1 \
+    --enable-bam-indexing true \
+    --enable-sort true \
+    --enable-duplicate-marking false \
+    ~{if (isRNA) then "--enable-rna true" else ""}
+    
+    zip -m ~{zipFileName} $(ls | grep '~{prefix}.*.csv\|~{prefix}.*.tab' | tr '\n' ' ')
+```
