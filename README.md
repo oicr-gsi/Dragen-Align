@@ -123,7 +123,9 @@ Output | Type | Description
      --enable-duplicate-marking false \
      ~{if (isRNA) then "--enable-rna true" else ""}
      
-     zip -m ~{zipFileName} $(ls | grep '~{prefix}.*.csv\|~{prefix}.*.tab' | tr '\n' ' ')
+     mkdir ~{zipFileName}
+     cp -t ~{zipFileName} $(ls | grep '~{prefix}.*.csv\|~{prefix}.*.tab' | tr '\n' ' ')
+     zip -r ~{zipFileName}.zip ~{zipFileName}
  ```
  ## Support
 
