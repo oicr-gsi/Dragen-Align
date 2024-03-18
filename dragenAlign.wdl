@@ -1,9 +1,16 @@
 version 1.0
 
+struct InputGroup {
+  File fastqR1
+  File fastqR2
+  String readGroup
+}
+
 workflow dragenAlign {
 
   input {
-    File fastqR1
+    Array[InputGroup]? inputGroups
+    File? fastqR1
     File? fastqR2
     String outputFileNamePrefix
     String reference
@@ -13,6 +20,7 @@ workflow dragenAlign {
   }
 
   parameter_meta {
+    inputGroups: "Array of fastq files to align using WT analysis"
     fastqR1: "Read 1, gzipped"
     fastqR2: "Read 2 for paired-end reads, gzipped"
     outputFileNamePrefix: "Prefix for output files"
@@ -28,6 +36,12 @@ workflow dragenAlign {
 
   String dragenRef = dragenRef_by_genome[reference]
   
+  scatter (ig in inputGroups) {
+    File read1s = ig.fastqR1
+    File read2s = ig.fastqR2
+    String readGroups = ig.readGroup
+  }
+
   # Validating the read-group information
   call readGroupFormat {  
     input: 
