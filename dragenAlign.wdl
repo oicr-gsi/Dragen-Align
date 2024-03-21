@@ -9,60 +9,54 @@ struct InputGroup {
 workflow dragenAlign {
 
   input {
-    Array[InputGroup]? inputGroups
-    File? fastqR1
-    File? fastqR2
+    Array[InputGroup] inputGroups
     String outputFileNamePrefix
     String reference
     Boolean adapterTrim = true
-    String rgInfo = "ID=1"
-    String mode
+    String isRNA
   }
 
-  parameter_meta {
-    inputGroups: "Array of fastq files to align using WT analysis"
-    fastqR1: "Read 1, gzipped"
-    fastqR2: "Read 2 for paired-end reads, gzipped"
-    outputFileNamePrefix: "Prefix for output files"
-    reference: "The genome reference build. For example: hg19, hg38, mm10"
-    adapterTrim: "Should adapters be trimmed, [true, trimmed]"
-    rgInfo: "Comma separated list of key value pairs representing the read-group information, possible keys are (ID, SM, LB, PU, PL, CN, DS, DT, PI)"
-    mode: "Specifies whether to complete genomic or transcriptomic analysis. Possible options are 'genome' or 'transcriptome'"
+  scatter (ig in inputGroups) {
+    File read1s = ig.fastqR1
+    File read2s = ig.fastqR2
+    String readGroups = ig.readGroup
   }
-
+  
   Map[String,String] dragenRef_by_genome = { 
     "hg38": "/staging/data/references/hg38fa.v9"
   }
 
   String dragenRef = dragenRef_by_genome[reference]
   
-  scatter (ig in inputGroups) {
-    File read1s = ig.fastqR1
-    File read2s = ig.fastqR2
-    String readGroups = ig.readGroup
+  parameter_meta {
+    inputGroups: "Array of fastq files to align using Dragen. Read-group information is required for fastq files, with the following fields being non-optional: RGID, RGSM, RGLB, RGPU. Each FASTQ file can only be referenced once."
+    outputFileNamePrefix: "Prefix for output files"
+    reference: "The genome reference build. For example: hg19, hg38, mm10"
+    adapterTrim: "Should adapters be trimmed, [true, trimmed]"
+    isRNA: "Specifies whether to complete transcriptomic analysis. Possible options are 'true' or 'false'"
   }
 
-  # Validating the read-group information
-  call readGroupFormat {  
+  call makeCSV {  
     input: 
-    rgInfo = rgInfo
+    read1s = read1s,
+    read2s = read2s,
+    prefix = outputFileNamePrefix,
+    readGroups = readGroups
   }
 
   call runDragen  { 
     input: 
-    read1 = fastqR1,
-    read2 = fastqR2,
+    csv = makeCSV.outCSV,
     dragenRef = dragenRef,
     adapterTrim = adapterTrim,
     prefix = outputFileNamePrefix,
-    mode = mode,
-    rgInfoString = readGroupFormat.rgInfoValid
+    isRNA = isRNA
   }
 
   meta {
     author: "Lawrence Heisler and Muna Mohamed"
     email: "lheisler@oicr.on.ca and mmohamed@oicr.on.ca"
-    description: "This workflow will align sequence data (WG or WT) provided as fastq files to the reference sequence using Illumina Dragen. Adapter trimming is optional. The bam file will be sorted and indexed"
+    description: "This workflow will align sequence data (WG or WT) provided as fastq files to the reference sequence using Illumina Dragen. Adapter trimming is optional. The bam file will be sorted and indexed."
     dependencies: [
       {
         name: "dragen",
@@ -80,24 +74,36 @@ workflow dragenAlign {
 
 }
 
-task readGroupFormat { 
+task makeCSV { 
   input { 
-    String rgInfo
+    Array[File] read1s
+    Array[File]? read2s #Check if it should be optional?
+    Array[File] readGroups
+    String prefix
     Int jobMemory = 1
     Int timeout = 5
   }
 
   parameter_meta { 
-    rgInfo: "The read-group information to be added into the bam file header" 
+    read1s: "Array of read 1 fastq files" 
+    read2s: "Array of read 2 fastq files. May be empty if single-read" 
+    readGroups: "Array of read-group information to be added into the bam file header" 
+    prefix: "Prefix for output files"
     jobMemory: "Memory allocated for this job" 
     timeout: "Hours before task timeout" 
   } 
   
+  String csvResult = "{prefix}_dragenInput.csv"
+  #Required in CSV: 
+  #RGID,RGSM,RGLB,Lane (RGPU),Read1File,Read2File 
+
   command <<< 
     set -euo pipefail 
 
+    # Allowed RG fields in Dragen
     fieldNames=("ID=" "LB=" "PL=" "PU=" "SM=" "CN=" "DS=" "DT=" "PI=") 
 
+    
     # Split the string into an array of fields (key-value pairs)
     IFS=, read -ra rgArray <<< ~{rgInfo}
 
@@ -136,47 +142,40 @@ task readGroupFormat {
   } 
 
   output { 
-    String rgInfoValid = read_string(stdout())
+    File outCSV = ~{csvResult}
   }
 
   meta { 
     output_meta: { 
-      rgInfoValid: "Formatted string containing the validated read-group information" 
+      outCSV: "Formatted csv input for Dragen, containing fastq files and read-group information" 
     } 
   } 
 } 
 
 task runDragen {
   input {
-    File read1
-    File? read2
+    File csv
     String dragenRef
     String prefix
-    String mode
+    Boolean isRNA
     Boolean adapterTrim
     String adapter1File = "/staging/data/resources/ADAPTER1"
     String adapter2File = "/staging/data/resources/ADAPTER2"
-    String rgInfoString
     Int jobMemory = 500
     Int timeout = 96
   }
 
   parameter_meta {
-    read1: "Fastq file for read 1"
-    read2: "Fastq file for read 2"
+    csv: "Formatted csv input for Dragen, containing fastq files and read-group information"
     dragenRef: "The reference genome to align the sample with by Dragen"
     prefix: "Prefix for output files"
-    mode: "Specifies whether to complete genomic or transcriptomic analysis. Possible options are 'genome' or 'transcriptome'"
+    isRNA: "True/False, whether to complete transcriptomic analysis"
     adapterTrim: "True/False for adapter trimming"
     adapter1File: "Adapters to be trimmed from read 1"
     adapter2File: "Adapters to be trimmed from read 2"
-    rgInfoString: "Formatted string containing the validated read-group information"
     jobMemory: "Memory allocated for this job"
     timeout: "Hours before task timeout"
   }
-  
-  # Boolean indicating whether to enable transcriptomic analysis
-  Boolean isRNA = if mode == "transcriptome" then true else false
   
   String zipFileName = "~{prefix}_additional_outputs"
 
@@ -185,9 +184,8 @@ task runDragen {
 
     dragen -f \
     -r ~{dragenRef} \
-    -1 ~{read1} \
-    ~{if (defined(read2)) then "-2 ~{read2}" else ""} \
-    ~{rgInfoString} \
+    --fastq-list ~{csv} \
+    --fastq-list-all-samples true \
     --enable-map-align true \
     --enable-map-align-output true \
     --output-directory ./ \
