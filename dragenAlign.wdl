@@ -13,7 +13,7 @@ workflow dragenAlign {
     String outputFileNamePrefix
     String reference
     Boolean adapterTrim = true
-    String isRNA
+    Boolean isRNA = false
   }
 
   scatter (ig in inputGroups) {
@@ -33,15 +33,22 @@ workflow dragenAlign {
     outputFileNamePrefix: "Prefix for output files"
     reference: "The genome reference build. For example: hg19, hg38, mm10"
     adapterTrim: "Should adapters be trimmed, [true, trimmed]"
-    isRNA: "Specifies whether to complete transcriptomic analysis. Possible options are 'true' or 'false'"
+    isRNA: "Specifies whether to complete transcriptomic analysis, [false, genomic]"
+  }
+
+  call headerFormat {
+    input:
+    readGroupString = readGroups[0],
+    prefix = outputFileNamePrefix
   }
 
   call makeCSV {  
     input: 
     read1s = read1s,
     read2s = read2s,
-    prefix = outputFileNamePrefix,
-    readGroups = readGroups
+    readGroups = readGroups,
+    csvHeader = headerFormat.csvHeader,
+    prefix = outputFileNamePrefix
   }
 
   call runDragen  { 
@@ -74,11 +81,83 @@ workflow dragenAlign {
 
 }
 
+task headerFormat { 
+  input { 
+    String readGroupString
+    String prefix
+    Int jobMemory = 1
+    Int timeout = 5
+  }
+
+  parameter_meta { 
+    readGroupString: "Read-group information of one of the fastq files" 
+    prefix: "Prefix for output files"
+    jobMemory: "Memory allocated for this job" 
+    timeout: "Hours before task timeout" 
+  } 
+  
+  command <<< 
+    set -euo pipefail 
+
+    # Split the string into an array of key-value pairs
+    IFS=, read -ra rgArray <<< ~{readGroupString}
+
+    # Declares an associative array and appends valid keys and their values in rgArray
+      # If duplicate keys are present, the right-most value will be used.
+    declare -A fieldsArray
+    for field in "${rgArray[@]}"; do
+      tag=${field:0:5}
+      if [ "$tag" == "RGID=" ] || [ "$tag" == "RGLB=" ] || [ "$tag" == "RGPL=" ] || \
+         [ "$tag" == "RGPU=" ] || [ "$tag" == "RGSM=" ] || [ "$tag" == "RGCN=" ] || \
+         [ "$tag" == "RGDS=" ] || [ "$tag" == "RGDT=" ] || [ "$tag" == "RGPI=" ] ;
+        fieldsArray[${field:0:4}]=$(echo "$field" | cut -d '=' -f2)
+      else
+        # Redirect error message to stderr
+        echo "Invalid tag: '$tag'" >&2  
+        exit 1
+      fi
+    done
+
+    # Ensures the required header information is present
+    if [ -z "${fieldsArray["RGID"]}" ] || \
+       [ -z "${fieldsArray["RGSM"]}" ] || \
+       [ -z "${fieldsArray["RGLB"]}" ] || \
+       [ -z "${fieldsArray["RGPU"]}" ]; then
+      echo "Missing required read-group information for header" >&2  
+      exit 1
+    fi
+
+    # Outputs the header in the proper format for Dragen
+    header="Read1File,Read2File"
+    for key in "${!fieldsArray[@]}"; do
+      header+=",${key}"
+    done
+
+    echo "$header"
+  >>> 
+
+  runtime { 
+    memory: "~{jobMemory} GB" 
+    timeout: "~{timeout}" 
+  } 
+
+  output { 
+    String csvHeader = read_string(stdout())
+  }
+
+  meta { 
+    output_meta: { 
+      csvHeader: "Formatted header for the csv input of Dragen" 
+    } 
+  } 
+} 
+
 task makeCSV { 
   input { 
     Array[File] read1s
     Array[File]? read2s #Check if it should be optional?
-    Array[File] readGroups
+    Array[String] readGroups
+    String csvHeader
     String prefix
     Int jobMemory = 1
     Int timeout = 5
@@ -88,52 +167,31 @@ task makeCSV {
     read1s: "Array of read 1 fastq files" 
     read2s: "Array of read 2 fastq files. May be empty if single-read" 
     readGroups: "Array of read-group information to be added into the bam file header" 
+    csvHeader: "Formatted header for the csv input of Dragen" 
     prefix: "Prefix for output files"
     jobMemory: "Memory allocated for this job" 
     timeout: "Hours before task timeout" 
   } 
   
   String csvResult = "{prefix}_dragenInput.csv"
-  #Required in CSV: 
-  #RGID,RGSM,RGLB,Lane (RGPU),Read1File,Read2File 
 
   command <<< 
     set -euo pipefail 
 
-    # Allowed RG fields in Dragen
-    fieldNames=("ID=" "LB=" "PL=" "PU=" "SM=" "CN=" "DS=" "DT=" "PI=") 
+    echo ~{csvHeader} > ~{csvResult}
+    
+    echo ~{read1s}
+    sed 's/RG..=//g' "RGID=XY,RGLB=ZY,RGSM=RM,RGDT=QR"
+    # To remove RG??= from a string
+    # sed 
+    "RGID=XY,RGLB=ZY,RGSM=RM,RGDT=QR" -> "XY,ZY,RM,QR"
+
+
+    # results in a file with each element occupting a line in the file ~{write_lines(bams)}
+    # File write_lines(Array[String])
+
 
     
-    # Split the string into an array of fields (key-value pairs)
-    IFS=, read -ra rgArray <<< ~{rgInfo}
-
-    # Declares an associative array and appends the values of the valid keys in rgArray
-      # If duplicate fields names are present, the right-most value will be used.
-    declare -A fieldsArray
-
-    for field in "${rgArray[@]}"; do
-      tag=${field:0:3}
-      validTag=false
-      for name in "${fieldNames[@]}"; do
-        if [ "$tag" == "$name" ]; then
-          validTag=true
-          fieldsArray[${field:0:2}]=$(echo "$field" | cut -d '=' -f2)
-        fi
-      done
-      if ! $validTag; then
-        # Redirect error message to stderr
-        echo "Invalid tag: '$tag'" >&2  
-        exit 1
-      fi
-    done
-
-    # Outputs the read-group information in the proper format for Dragen
-    readGroupString=""
-    for key in "${!fieldsArray[@]}"; do
-      readGroupString+=" --RG${key} ${fieldsArray[$key]}"
-    done
-
-    echo "$readGroupString"
   >>> 
 
   runtime { 
@@ -142,7 +200,7 @@ task makeCSV {
   } 
 
   output { 
-    File outCSV = ~{csvResult}
+    File outCSV = "~{csvResult}"
   }
 
   meta { 
