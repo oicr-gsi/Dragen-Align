@@ -179,7 +179,7 @@ task makeCSV {
   } 
   
   String csvResult = "~{prefix}_dragenInput.csv"
-  Int arrayLength = round(size(read1s))
+  Int arrayLength = length(read1s)
 
   command <<< 
     set -euo pipefail 
