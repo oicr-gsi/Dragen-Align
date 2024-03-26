@@ -16,10 +16,17 @@ workflow dragenAlign {
     Boolean isRNA = false
   }
 
+  Boolean isPaired = if (defined(inputGroups[0].fastqR2)) then true else false
+
   scatter (ig in inputGroups) {
     File read1s = ig.fastqR1
-    File read2s = ig.fastqR2
     String readGroups = ig.readGroup
+  }
+
+  if(isPaired) {
+    scatter (ig in inputGroups) {
+      File read2s = select_all([ig.fastqR2])[0]
+    }
   }
   
   Map[String,String] dragenRef_by_genome = { 
@@ -47,6 +54,7 @@ workflow dragenAlign {
     read1s = read1s,
     read2s = read2s,
     readGroups = readGroups,
+    isPaired = isPaired,
     csvHeader = headerFormat.csvHeader,
     prefix = outputFileNamePrefix
   }
@@ -99,18 +107,19 @@ task headerFormat {
   command <<< 
     set -euo pipefail 
 
+    headerString="Read1File,Read2File"
+    
     # Split the string into an array of key-value pairs
     IFS=, read -ra rgArray <<< ~{readGroupString}
 
-    # Declares an associative array and appends valid keys and their values in rgArray
-      # If duplicate keys are present, the right-most value will be used.
-    declare -A fieldsArray
+    # Adds valid keys (for Dragen) to headerString
     for field in "${rgArray[@]}"; do
       tag=${field:0:5}
       if [ "$tag" == "RGID=" ] || [ "$tag" == "RGLB=" ] || [ "$tag" == "RGPL=" ] || \
          [ "$tag" == "RGPU=" ] || [ "$tag" == "RGSM=" ] || [ "$tag" == "RGCN=" ] || \
-         [ "$tag" == "RGDS=" ] || [ "$tag" == "RGDT=" ] || [ "$tag" == "RGPI=" ] ;
-        fieldsArray[${field:0:4}]=$(echo "$field" | cut -d '=' -f2)
+         [ "$tag" == "RGDS=" ] || [ "$tag" == "RGDT=" ] || [ "$tag" == "RGPI=" ]
+      then
+        headerString+=",${field:0:4}"
       else
         # Redirect error message to stderr
         echo "Invalid tag: '$tag'" >&2  
@@ -119,21 +128,15 @@ task headerFormat {
     done
 
     # Ensures the required header information is present
-    if [ -z "${fieldsArray["RGID"]}" ] || \
-       [ -z "${fieldsArray["RGSM"]}" ] || \
-       [ -z "${fieldsArray["RGLB"]}" ] || \
-       [ -z "${fieldsArray["RGPU"]}" ]; then
-      echo "Missing required read-group information for header" >&2  
+    if [ "$(echo "$headerString" | grep -c "RGID")" != 1 ] || \
+       [ "$(echo "$headerString" | grep -c "RGSM")" != 1 ] || \
+       [ "$(echo "$headerString" | grep -c "RGLB")" != 1 ] || \
+       [ "$(echo "$headerString" | grep -c "RGPU")" != 1 ]; then
+      echo "Missing required read-group information from header" >&2  
       exit 1
     fi
 
-    # Outputs the header in the proper format for Dragen
-    header="Read1File,Read2File"
-    for key in "${!fieldsArray[@]}"; do
-      header+=",${key}"
-    done
-
-    echo "$header"
+    echo "$headerString"
   >>> 
 
   runtime { 
@@ -155,8 +158,9 @@ task headerFormat {
 task makeCSV { 
   input { 
     Array[File] read1s
-    Array[File]? read2s #Check if it should be optional?
+    Array[File]? read2s
     Array[String] readGroups
+    Boolean isPaired
     String csvHeader
     String prefix
     Int jobMemory = 1
@@ -165,33 +169,36 @@ task makeCSV {
 
   parameter_meta { 
     read1s: "Array of read 1 fastq files" 
-    read2s: "Array of read 2 fastq files. May be empty if single-read" 
+    read2s: "Array of read 2 fastq files. May be empty." 
     readGroups: "Array of read-group information to be added into the bam file header" 
+    isPaired: "Identifies if paired-end sequencing, [true, paired]"
     csvHeader: "Formatted header for the csv input of Dragen" 
     prefix: "Prefix for output files"
     jobMemory: "Memory allocated for this job" 
     timeout: "Hours before task timeout" 
   } 
   
-  String csvResult = "{prefix}_dragenInput.csv"
+  String csvResult = "~{prefix}_dragenInput.csv"
+  Int arrayLength = round(size(read1s))
 
   command <<< 
     set -euo pipefail 
-
+    
     echo ~{csvHeader} > ~{csvResult}
+
+    # Load arrays into bash variables
+    arrRead1s=(~{sep=" " read1s})
+    if ~{isPaired}; then arrRead2s=(~{sep=" " read2s}); fi
+    arrReadGroups=(~{sep=" " readGroups})
     
-    echo ~{read1s}
-    sed 's/RG..=//g' "RGID=XY,RGLB=ZY,RGSM=RM,RGDT=QR"
-    # To remove RG??= from a string
-    # sed 
-    "RGID=XY,RGLB=ZY,RGSM=RM,RGDT=QR" -> "XY,ZY,RM,QR"
-
-
-    # results in a file with each element occupting a line in the file ~{write_lines(bams)}
-    # File write_lines(Array[String])
-
-
-    
+    # Iterate over the arrays concurrently
+    for (( i = 0; i < ~{arrayLength}; i++ ))
+    do
+      read1="${arrRead1s[i]}"
+      if ~{isPaired}; then read2="${arrRead2s[i]}"; else read2=""; fi
+      readGroup=$(echo "${arrReadGroups[i]}" | sed 's/RG..=//g')
+      echo "$read1,$read2,$readGroup" >> ~{csvResult}
+    done
   >>> 
 
   runtime { 
@@ -208,7 +215,7 @@ task makeCSV {
       outCSV: "Formatted csv input for Dragen, containing fastq files and read-group information" 
     } 
   } 
-} 
+}
 
 task runDragen {
   input {
