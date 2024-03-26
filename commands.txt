@@ -1,0 +1,90 @@
+## Commands
+This section lists command(s) run by dragenAlign workflow
+
+* Running dragenAlign
+
+=== Ensures the read-group information is valid, and outputs a header for the input CSV ===.
+
+``` 
+    set -euo pipefail 
+
+    headerString="Read1File,Read2File"
+    
+    # Split the string into an array of key-value pairs
+    IFS=, read -ra rgArray <<< ~{readGroupString}
+
+    # Adds valid keys (for Dragen) to headerString
+    for field in "${rgArray[@]}"; do
+      tag=${field:0:5}
+      if [ "$tag" == "RGID=" ] || [ "$tag" == "RGLB=" ] || [ "$tag" == "RGPL=" ] || \
+         [ "$tag" == "RGPU=" ] || [ "$tag" == "RGSM=" ] || [ "$tag" == "RGCN=" ] || \
+         [ "$tag" == "RGDS=" ] || [ "$tag" == "RGDT=" ] || [ "$tag" == "RGPI=" ]
+      then
+        headerString+=",${field:0:4}"
+      else
+        # Redirect error message to stderr
+        echo "Invalid tag: '$tag'" >&2  
+        exit 1
+      fi
+    done
+
+    # Ensures the required header information is present
+    if [ "$(echo "$headerString" | grep -c "RGID")" != 1 ] || \
+       [ "$(echo "$headerString" | grep -c "RGSM")" != 1 ] || \
+       [ "$(echo "$headerString" | grep -c "RGLB")" != 1 ] || \
+       [ "$(echo "$headerString" | grep -c "RGPU")" != 1 ]; then
+      echo "Missing required read-group information from header" >&2  
+      exit 1
+    fi
+
+    echo "$headerString"
+```
+
+=== Format input CSV file for Dragen ===.
+
+``` 
+    set -euo pipefail 
+    
+    echo ~{csvHeader} > ~{csvResult}
+
+    # Load arrays into bash variables
+    arrRead1s=(~{sep=" " read1s})
+    if ~{isPaired}; then arrRead2s=(~{sep=" " read2s}); fi
+    arrReadGroups=(~{sep=" " readGroups})
+    
+    # Iterate over the arrays concurrently
+    for (( i = 0; i < ~{arrayLength}; i++ ))
+    do
+      read1="${arrRead1s[i]}"
+      if ~{isPaired}; then read2="${arrRead2s[i]}"; else read2=""; fi
+      readGroup=$(echo "${arrReadGroups[i]}" | sed 's/RG..=//g')
+      echo "$read1,$read2,$readGroup" >> ~{csvResult}
+    done
+```
+
+=== Align to reference using Dragen ===.
+
+```
+    set -euo pipefail
+
+    dragen -f \
+    -r ~{dragenRef} \
+    --fastq-list ~{csv} \
+    --fastq-list-all-samples true \
+    --enable-map-align true \
+    --enable-map-align-output true \
+    --output-directory ./ \
+    --output-file-prefix ~{prefix} \
+    ~{if (adapterTrim) then "--read-trimmers adapter" +
+                            " --trim-adapter-read1 ~{adapter1File}" +
+                            " --trim-adapter-read2 ~{adapter2File}" else ""} \
+    --trim-min-length 1 \
+    --enable-bam-indexing true \
+    --enable-sort true \
+    --enable-duplicate-marking false \
+    ~{if (isRNA) then "--enable-rna true" else ""}
+    
+    mkdir ~{zipFileName}
+    cp -t ~{zipFileName} $(ls | grep '~{prefix}.*.csv\|~{prefix}.*.tab' | tr '\n' ' ')
+    zip -r ~{zipFileName}.zip ~{zipFileName}
+```
