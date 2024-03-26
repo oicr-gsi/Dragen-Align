@@ -2,7 +2,7 @@ version 1.0
 
 struct InputGroup {
   File fastqR1
-  File fastqR2
+  File? fastqR2
   String readGroup
 }
 
