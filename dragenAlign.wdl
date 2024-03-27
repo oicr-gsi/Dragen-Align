@@ -25,6 +25,7 @@ workflow dragenAlign {
 
   if(isPaired) {
     scatter (ig in inputGroups) {
+      # Workaround for converting File? type to File
       File read2s = select_all([ig.fastqR2])[0]
     }
   }
