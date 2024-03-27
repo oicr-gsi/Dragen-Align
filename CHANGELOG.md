@@ -1,5 +1,5 @@
 ## 1.2.0 - 2024-03-26
-- Workflow requires an array of fastq files with read-groups as input. Single fastq-pairs (or single fastq files) must also be inputted as an array. 
+- Workflow requires an array of fastq files with read-groups as input. A single fastq-pair (or a single fastq file) must also be inputted as an array. 
 - runDragen task outputs a merged bam file
 - Added new task makeCSV and headerFormat, and removed readGroupFormat task
 - Replaced mode parameter with isRNA parameter (false by default)
