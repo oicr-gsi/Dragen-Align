@@ -1,6 +1,8 @@
 {
     "names": [
-        "dragenAlign"
+        "dragenAlign_WG_lane_level",
+        "dragenAlign_WT_call_ready",
+        "dragenAlign_WT_lane_level"
     ],
     "wdl": "dragenAlign.wdl"
 }

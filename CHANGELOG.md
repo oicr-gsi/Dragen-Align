@@ -1,3 +1,5 @@
+## 1.2.1 - 2024-04-04
+- Changed names in vidarrbuild.json
 ## 1.2.0 - 2024-03-26
 - Workflow requires an array of fastq files with read-groups as input. A single fastq-pair (or a single fastq file) must also be inputted as an array. 
 - runDragen task outputs a merged bam file
