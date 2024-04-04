@@ -1,54 +1,78 @@
 version 1.0
 
+struct InputGroup {
+  File fastqR1
+  File? fastqR2
+  String readGroup
+}
+
 workflow dragenAlign {
 
   input {
-    File fastqR1
-    File? fastqR2
+    Array[InputGroup] inputGroups
     String outputFileNamePrefix
     String reference
     Boolean adapterTrim = true
-    String rgInfo = "ID=1"
-    String mode
+    Boolean isRNA = false
   }
 
-  parameter_meta {
-    fastqR1: "Read 1, gzipped"
-    fastqR2: "Read 2 for paired-end reads, gzipped"
-    outputFileNamePrefix: "Prefix for output files"
-    reference: "The genome reference build. For example: hg19, hg38, mm10"
-    adapterTrim: "Should adapters be trimmed, [true, trimmed]"
-    rgInfo: "Comma separated list of key value pairs representing the read-group information, possible keys are (ID, SM, LB, PU, PL, CN, DS, DT, PI)"
-    mode: "Specifies whether to complete genomic or transcriptomic analysis. Possible options are 'genome' or 'transcriptome'"
+  Boolean isPaired = if (defined(inputGroups[0].fastqR2)) then true else false
+
+  scatter (ig in inputGroups) {
+    File read1s = ig.fastqR1
+    String readGroups = ig.readGroup
   }
 
+  if(isPaired) {
+    scatter (ig in inputGroups) {
+      # Workaround for converting File? type to File
+      File read2s = select_all([ig.fastqR2])[0]
+    }
+  }
+  
   Map[String,String] dragenRef_by_genome = { 
     "hg38": "/staging/data/references/hg38fa.v9"
   }
 
   String dragenRef = dragenRef_by_genome[reference]
   
-  # Validating the read-group information
-  call readGroupFormat {  
+  parameter_meta {
+    inputGroups: "Array of fastq files to align using Dragen. Read-group information is required for fastq files, with the following fields being non-optional: RGID, RGSM, RGLB, RGPU. Each FASTQ file can only be referenced once."
+    outputFileNamePrefix: "Prefix for output files"
+    reference: "The genome reference build. For example: hg19, hg38, mm10"
+    adapterTrim: "Should adapters be trimmed, [true, trimmed]"
+    isRNA: "Specifies whether to complete transcriptomic analysis, [false, genomic]"
+  }
+
+  call headerFormat {
+    input:
+    readGroupString = readGroups[0],
+    prefix = outputFileNamePrefix
+  }
+
+  call makeCSV {  
     input: 
-    rgInfo = rgInfo
+    read1s = read1s,
+    read2s = read2s,
+    readGroups = readGroups,
+    isPaired = isPaired,
+    csvHeader = headerFormat.csvHeader,
+    prefix = outputFileNamePrefix
   }
 
   call runDragen  { 
     input: 
-    read1 = fastqR1,
-    read2 = fastqR2,
+    csv = makeCSV.outCSV,
     dragenRef = dragenRef,
     adapterTrim = adapterTrim,
     prefix = outputFileNamePrefix,
-    mode = mode,
-    rgInfoString = readGroupFormat.rgInfoValid
+    isRNA = isRNA
   }
 
   meta {
     author: "Lawrence Heisler and Muna Mohamed"
     email: "lheisler@oicr.on.ca and mmohamed@oicr.on.ca"
-    description: "This workflow will align sequence data (WG or WT) provided as fastq files to the reference sequence using Illumina Dragen. Adapter trimming is optional. The bam file will be sorted and indexed"
+    description: "This workflow will align sequence data (WG or WT) provided as fastq files to the reference sequence using Illumina Dragen. Adapter trimming is optional. The bam file will be sorted and indexed."
     dependencies: [
       {
         name: "dragen",
@@ -66,15 +90,17 @@ workflow dragenAlign {
 
 }
 
-task readGroupFormat { 
+task headerFormat { 
   input { 
-    String rgInfo
+    String readGroupString
+    String prefix
     Int jobMemory = 1
     Int timeout = 5
   }
 
   parameter_meta { 
-    rgInfo: "The read-group information to be added into the bam file header" 
+    readGroupString: "Read-group information of one of the fastq files" 
+    prefix: "Prefix for output files"
     jobMemory: "Memory allocated for this job" 
     timeout: "Hours before task timeout" 
   } 
@@ -82,38 +108,36 @@ task readGroupFormat {
   command <<< 
     set -euo pipefail 
 
-    fieldNames=("ID=" "LB=" "PL=" "PU=" "SM=" "CN=" "DS=" "DT=" "PI=") 
+    headerString="Read1File,Read2File"
+    
+    # Split the string into an array of key-value pairs
+    IFS=, read -ra rgArray <<< ~{readGroupString}
 
-    # Split the string into an array of fields (key-value pairs)
-    IFS=, read -ra rgArray <<< ~{rgInfo}
-
-    # Declares an associative array and appends the values of the valid keys in rgArray
-      # If duplicate fields names are present, the right-most value will be used.
-    declare -A fieldsArray
-
+    # Adds valid keys (for Dragen) to headerString
     for field in "${rgArray[@]}"; do
-      tag=${field:0:3}
-      validTag=false
-      for name in "${fieldNames[@]}"; do
-        if [ "$tag" == "$name" ]; then
-          validTag=true
-          fieldsArray[${field:0:2}]=$(echo "$field" | cut -d '=' -f2)
-        fi
-      done
-      if ! $validTag; then
+      tag=${field:0:5}
+      if [ "$tag" == "RGID=" ] || [ "$tag" == "RGLB=" ] || [ "$tag" == "RGPL=" ] || \
+         [ "$tag" == "RGPU=" ] || [ "$tag" == "RGSM=" ] || [ "$tag" == "RGCN=" ] || \
+         [ "$tag" == "RGDS=" ] || [ "$tag" == "RGDT=" ] || [ "$tag" == "RGPI=" ]
+      then
+        headerString+=",${field:0:4}"
+      else
         # Redirect error message to stderr
         echo "Invalid tag: '$tag'" >&2  
         exit 1
       fi
     done
 
-    # Outputs the read-group information in the proper format for Dragen
-    readGroupString=""
-    for key in "${!fieldsArray[@]}"; do
-      readGroupString+=" --RG${key} ${fieldsArray[$key]}"
-    done
+    # Ensures the required header information is present
+    if [ "$(echo "$headerString" | grep -c "RGID")" != 1 ] || \
+       [ "$(echo "$headerString" | grep -c "RGSM")" != 1 ] || \
+       [ "$(echo "$headerString" | grep -c "RGLB")" != 1 ] || \
+       [ "$(echo "$headerString" | grep -c "RGPU")" != 1 ]; then
+      echo "Missing required read-group information from header" >&2  
+      exit 1
+    fi
 
-    echo "$readGroupString"
+    echo "$headerString"
   >>> 
 
   runtime { 
@@ -122,47 +146,102 @@ task readGroupFormat {
   } 
 
   output { 
-    String rgInfoValid = read_string(stdout())
+    String csvHeader = read_string(stdout())
   }
 
   meta { 
     output_meta: { 
-      rgInfoValid: "Formatted string containing the validated read-group information" 
+      csvHeader: "Formatted header for the csv input of Dragen" 
     } 
   } 
 } 
 
+task makeCSV { 
+  input { 
+    Array[File] read1s
+    Array[File]? read2s
+    Array[String] readGroups
+    Boolean isPaired
+    String csvHeader
+    String prefix
+    Int jobMemory = 1
+    Int timeout = 5
+  }
+
+  parameter_meta { 
+    read1s: "Array of read 1 fastq files" 
+    read2s: "Array of read 2 fastq files. May be empty." 
+    readGroups: "Array of read-group information to be added into the bam file header" 
+    isPaired: "Identifies if paired-end sequencing, [true, paired]"
+    csvHeader: "Formatted header for the csv input of Dragen" 
+    prefix: "Prefix for output files"
+    jobMemory: "Memory allocated for this job" 
+    timeout: "Hours before task timeout" 
+  } 
+  
+  String csvResult = "~{prefix}_dragenInput.csv"
+  Int arrayLength = length(read1s)
+
+  command <<< 
+    set -euo pipefail 
+    
+    echo ~{csvHeader} > ~{csvResult}
+
+    # Load arrays into bash variables
+    arrRead1s=(~{sep=" " read1s})
+    if ~{isPaired}; then arrRead2s=(~{sep=" " read2s}); fi
+    arrReadGroups=(~{sep=" " readGroups})
+    
+    # Iterate over the arrays concurrently
+    for (( i = 0; i < ~{arrayLength}; i++ ))
+    do
+      read1="${arrRead1s[i]}"
+      if ~{isPaired}; then read2="${arrRead2s[i]}"; else read2=""; fi
+      readGroup=$(echo "${arrReadGroups[i]}" | sed 's/RG..=//g')
+      echo "$read1,$read2,$readGroup" >> ~{csvResult}
+    done
+  >>> 
+
+  runtime { 
+    memory: "~{jobMemory} GB" 
+    timeout: "~{timeout}" 
+  } 
+
+  output { 
+    File outCSV = "~{csvResult}"
+  }
+
+  meta { 
+    output_meta: { 
+      outCSV: "Formatted csv input for Dragen, containing fastq files and read-group information" 
+    } 
+  } 
+}
+
 task runDragen {
   input {
-    File read1
-    File? read2
+    File csv
     String dragenRef
     String prefix
-    String mode
+    Boolean isRNA
     Boolean adapterTrim
     String adapter1File = "/staging/data/resources/ADAPTER1"
     String adapter2File = "/staging/data/resources/ADAPTER2"
-    String rgInfoString
     Int jobMemory = 500
     Int timeout = 96
   }
 
   parameter_meta {
-    read1: "Fastq file for read 1"
-    read2: "Fastq file for read 2"
+    csv: "Formatted csv input for Dragen, containing fastq files and read-group information"
     dragenRef: "The reference genome to align the sample with by Dragen"
     prefix: "Prefix for output files"
-    mode: "Specifies whether to complete genomic or transcriptomic analysis. Possible options are 'genome' or 'transcriptome'"
+    isRNA: "True/False, whether to complete transcriptomic analysis"
     adapterTrim: "True/False for adapter trimming"
     adapter1File: "Adapters to be trimmed from read 1"
     adapter2File: "Adapters to be trimmed from read 2"
-    rgInfoString: "Formatted string containing the validated read-group information"
     jobMemory: "Memory allocated for this job"
     timeout: "Hours before task timeout"
   }
-  
-  # Boolean indicating whether to enable transcriptomic analysis
-  Boolean isRNA = if mode == "transcriptome" then true else false
   
   String zipFileName = "~{prefix}_additional_outputs"
 
@@ -171,9 +250,8 @@ task runDragen {
 
     dragen -f \
     -r ~{dragenRef} \
-    -1 ~{read1} \
-    ~{if (defined(read2)) then "-2 ~{read2}" else ""} \
-    ~{rgInfoString} \
+    --fastq-list ~{csv} \
+    --fastq-list-all-samples true \
     --enable-map-align true \
     --enable-map-align-output true \
     --output-directory ./ \
