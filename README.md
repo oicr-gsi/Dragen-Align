@@ -145,7 +145,8 @@ Output | Type | Description
      mkdir ~{zipFileName}
      cp -t ~{zipFileName} $(ls | grep '~{prefix}.*.csv\|~{prefix}.*.tab' | tr '\n' ' ')
      zip -r ~{zipFileName}.zip ~{zipFileName}
- ``` ## Support
+ ```
+## Support
 
 For support, please file an issue on the [Github project](https://github.com/oicr-gsi) or send an email to gsi@oicr.on.ca .
 
