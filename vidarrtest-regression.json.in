@@ -87,7 +87,7 @@
             {
                 "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
                 "metrics_compare": "@CHECKOUT@/tests/compare.sh",
-                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.2.0/output_metrics/PCSI0022C_notrim_bam.metrics",
+                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.2.2/output_metrics/PCSI0022C_notrim_bam.metrics",
                 "type": "script"
             }
         ]
@@ -180,7 +180,7 @@
             {
                 "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
                 "metrics_compare": "@CHECKOUT@/tests/compare.sh",
-                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.2.0/output_metrics/PCSI0022C_trim_bam.metrics",
+                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.2.2/output_metrics/PCSI0022C_trim_bam.metrics",
                 "type": "script"
             }
         ]
@@ -262,7 +262,7 @@
             {
                 "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
                 "metrics_compare": "@CHECKOUT@/tests/compare.sh",
-                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.2.0/output_metrics/PCSI0022C_trim_bam_se.metrics",
+                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.2.2/output_metrics/PCSI0022C_trim_bam_se.metrics",
                 "type": "script"
             }
         ]
@@ -345,7 +345,7 @@
             {
                 "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
                 "metrics_compare": "@CHECKOUT@/tests/compare.sh",
-                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.2.0/output_metrics/PCSI0022C_notrim_bam_se.metrics",
+                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.2.2/output_metrics/PCSI0022C_notrim_bam_se.metrics",
                 "type": "script"
             }
         ]
@@ -438,7 +438,7 @@
             {
                 "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
                 "metrics_compare": "@CHECKOUT@/tests/compare.sh",
-                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.2.0/output_metrics/K562_notrim_wt_bam.metrics",
+                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.2.2/output_metrics/K562_notrim_wt_bam.metrics",
                 "type": "script"
             }
         ]
@@ -531,7 +531,7 @@
             {
                 "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
                 "metrics_compare": "@CHECKOUT@/tests/compare.sh",
-                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.2.0/output_metrics/K562_trim_wt_bam.metrics",
+                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.2.2/output_metrics/K562_trim_wt_bam.metrics",
                 "type": "script"
             }
         ]
@@ -613,7 +613,7 @@
             {
                 "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
                 "metrics_compare": "@CHECKOUT@/tests/compare.sh",
-                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.2.0/output_metrics/K562_notrim_wt_bam_se.metrics",
+                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.2.2/output_metrics/K562_notrim_wt_bam_se.metrics",
                 "type": "script"
             }
         ]
@@ -711,7 +711,7 @@
             {
                 "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
                 "metrics_compare": "@CHECKOUT@/tests/compare.sh",
-                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.2.0/output_metrics/VENHPV_notrim_wt_bam_se.metrics",
+                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.2.2/output_metrics/VENHPV_notrim_wt_bam_se.metrics",
                 "type": "script"
             }
         ]
@@ -831,7 +831,7 @@
             {
                 "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
                 "metrics_compare": "@CHECKOUT@/tests/compare.sh",
-                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.2.0/output_metrics/VENHPV_trim_wt_bam.metrics",
+                "output_metrics": "/.mounts/labs/gsi/testdata/dragenAlign/1.2.2/output_metrics/VENHPV_trim_wt_bam.metrics",
                 "type": "script"
             }
         ]
