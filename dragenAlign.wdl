@@ -31,7 +31,7 @@ workflow dragenAlign {
   }
   
   Map[String,String] dragenRef_by_genome = { 
-    "hg38": "/staging/data/references/hg38fa.v9"
+    "hg38": "/staging/data/references/hg38-p12.v9"
   }
 
   String dragenRef = dragenRef_by_genome[reference]

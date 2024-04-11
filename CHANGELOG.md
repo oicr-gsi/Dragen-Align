@@ -1,3 +1,5 @@
+## 1.2.2 - 2024-04-09
+- Updated to a reference built using hg38/p12
 ## 1.2.1 - 2024-04-04
 - Changed names in vidarrbuild.json
 ## 1.2.0 - 2024-03-26
