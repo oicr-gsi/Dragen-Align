@@ -1,3 +1,5 @@
+## 1.3.0 - 2024-06-25
+[GRD-797](https://jira.oicr.on.ca/browse/GRD-797) - add vidarr labels to outputs (changes to medata only)
 ## 1.2.2 - 2024-04-09
 - Updated to a reference built using hg38/p12
 ## 1.2.1 - 2024-04-04

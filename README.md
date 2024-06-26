@@ -48,22 +48,22 @@ Parameter|Value|Default|Description
 
 ### Outputs
 
-Output | Type | Description
----|---|---
-`bam`|File|Output bam aligned to genome
-`bamIndex`|File|Index for the aligned bam
-`zippedOut`|File|Zip file containing the supporting .csv and .tab outputs from Dragen
-`outputChimeric`|File?|Output chimeric junctions file, if available
+Output | Type | Description | Labels
+---|---|---|---
+`bam`|File|Output bam aligned to genome|
+`bamIndex`|File|Index for the aligned bam|
+`zippedOut`|File|Zip file containing the supporting .csv and .tab outputs from Dragen|
+`outputChimeric`|File?|Output chimeric junctions file, if available|
 
 
 ## Commands
- This section lists command(s) run by dragenAlign workflow
+This section lists command(s) run by dragenAlign workflow
  
- * Running dragenAlign
+* Running dragenAlign
  
- === Ensures the read-group information is valid, and outputs a header for the input CSV ===.
+### Ensures the read-group information is valid, and outputs a header for the input CSV.
  
- ``` 
+``` 
      set -euo pipefail 
  
      headerString="Read1File,Read2File"
@@ -96,11 +96,11 @@ Output | Type | Description
      fi
  
      echo "$headerString"
- ```
+```
  
- === Format input CSV file for Dragen ===.
+### Format input CSV file for Dragen.
  
- ``` 
+``` 
      set -euo pipefail 
      
      echo ~{csvHeader} > ~{csvResult}
@@ -118,11 +118,11 @@ Output | Type | Description
        readGroup=$(echo "${arrReadGroups[i]}" | sed 's/RG..=//g')
        echo "$read1,$read2,$readGroup" >> ~{csvResult}
      done
- ```
+```
  
- === Align to reference using Dragen ===.
+### Align to reference using Dragen.
  
- ```
+```
      set -euo pipefail
  
      dragen -f \
@@ -145,7 +145,7 @@ Output | Type | Description
      mkdir ~{zipFileName}
      cp -t ~{zipFileName} $(ls | grep '~{prefix}.*.csv\|~{prefix}.*.tab' | tr '\n' ' ')
      zip -r ~{zipFileName}.zip ~{zipFileName}
- ```
+```
 ## Support
 
 For support, please file an issue on the [Github project](https://github.com/oicr-gsi) or send an email to gsi@oicr.on.ca .
