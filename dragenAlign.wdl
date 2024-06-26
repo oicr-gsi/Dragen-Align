@@ -150,9 +150,12 @@ task headerFormat {
   }
 
   meta { 
-    output_meta: { 
-      csvHeader: "Formatted header for the csv input of Dragen" 
-    } 
+    output_meta: {
+    csvHeader: {
+        description: "Formatted header for the csv input of Dragen",
+        vidarr_label: "csvHeader"
+    }
+}
   } 
 } 
 
