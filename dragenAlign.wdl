@@ -31,7 +31,7 @@ workflow dragenAlign {
   }
   
   Map[String,String] dragenRef_by_genome = { 
-    "hg38": "/staging/data/references/hg38-p12.v9"
+    "hg38": "/.mounts/labs/gsiprojects/gsi/Dragen/reference/hg38fa.p12/"  # /staging/data/references/hg38-p12.v9
   }
 
   String dragenRef = dragenRef_by_genome[reference]
@@ -79,6 +79,24 @@ workflow dragenAlign {
         url: "https://developer.illumina.com/dragen"
       }
     ]
+    output_meta: {
+        bam: {
+            description: "BAM file with alignments",
+            vidarr_label: "bam"
+        },
+        bamIndex: {
+            description: "index of BAM file with alignments",
+            vidarr_label: "bamIndex"
+        },
+        zippedOut: {
+            description: "Zipped .csv and .tab files (additional outputs)",
+            vidarr_label: "zippedOut"
+        }
+        outputChimeric: {
+            description: "Optional output file with chimeric junctions",
+            vidarr_label: "outputChimeric"
+        }
+   }
   }
 
   output {

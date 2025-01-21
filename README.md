@@ -50,10 +50,10 @@ Parameter|Value|Default|Description
 
 Output | Type | Description | Labels
 ---|---|---|---
-`bam`|File|Output bam aligned to genome|
-`bamIndex`|File|Index for the aligned bam|
-`zippedOut`|File|Zip file containing the supporting .csv and .tab outputs from Dragen|
-`outputChimeric`|File?|Output chimeric junctions file, if available|
+`bam`|File|BAM file with alignments|vidarr_label: bam
+`bamIndex`|File|index of BAM file with alignments|vidarr_label: bamIndex
+`zippedOut`|File|Zipped .csv and .tab files (additional outputs)|vidarr_label: zippedOut
+`outputChimeric`|File?|Optional output file with chimeric junctions|vidarr_label: outputChimeric
 
 
 ## Commands
