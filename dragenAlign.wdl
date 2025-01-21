@@ -91,7 +91,7 @@ workflow dragenAlign {
         zippedOut: {
             description: "Zipped .csv and .tab files (additional outputs)",
             vidarr_label: "zippedOut"
-        }
+        },
         outputChimeric: {
             description: "Optional output file with chimeric junctions",
             vidarr_label: "outputChimeric"
@@ -246,8 +246,8 @@ task runDragen {
     String prefix
     Boolean isRNA
     Boolean adapterTrim
-    String adapter1File = "/staging/data/resources/ADAPTER1"
-    String adapter2File = "/staging/data/resources/ADAPTER2"
+    String adapter1File = "/.mounts/labs/gsiprojects/gsi/Dragen/resources/ADAPTER1"
+    String adapter2File = "/.mounts/labs/gsiprojects/gsi/Dragen/resources/ADAPTER2"
     Int jobMemory = 500
     Int timeout = 96
   }
