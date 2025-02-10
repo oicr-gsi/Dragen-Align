@@ -36,10 +36,14 @@ Parameter|Value|Default|Description
 #### Optional task parameters:
 Parameter|Value|Default|Description
 ---|---|---|---
-`headerFormat.jobMemory`|Int|1|Memory allocated for this job
-`headerFormat.timeout`|Int|5|Hours before task timeout
-`makeCSV.jobMemory`|Int|1|Memory allocated for this job
-`makeCSV.timeout`|Int|5|Hours before task timeout
+`extractInfoLine.parsingScript`|String|"$DRAGEN_SCRIPTS_ROOT/bin/composeList.py"|Script for parsing inputs into a line
+`extractInfoLine.timeout`|Int|4|Timeout for the job
+`extractInfoLine.jobMemory`|Int|4|Job allocated RAM
+`extractInfoLine.modules`|String|"dragen-scripts/0.1"|dependency modules
+`composeList.listWritingScript`|String|"$DRAGEN_SCRIPTS_ROOT/bin/writeFile.py"|Script for writing out list of inputs
+`composeList.jobMemory`|Int|4|Job allocated RAM
+`composeList.timeout`|Int|4|Timeout for the job
+`composeList.modules`|String|"dragen-scripts/0.1"|dependency modules
 `runDragen.adapter1File`|String|"/staging/data/resources/ADAPTER1"|Adapters to be trimmed from read 1
 `runDragen.adapter2File`|String|"/staging/data/resources/ADAPTER2"|Adapters to be trimmed from read 2
 `runDragen.jobMemory`|Int|500|Memory allocated for this job
@@ -63,64 +67,15 @@ This section lists command(s) run by dragenAlign workflow
  
 ### Ensures the read-group information is valid, and outputs a header for the input CSV.
  
-``` 
-     set -euo pipefail 
- 
-     headerString="Read1File,Read2File"
-     
-     # Split the string into an array of key-value pairs
-     IFS=, read -ra rgArray <<< ~{readGroupString}
- 
-     # Adds valid keys (for Dragen) to headerString
-     for field in "${rgArray[@]}"; do
-       tag=${field:0:5}
-       if [ "$tag" == "RGID=" ] || [ "$tag" == "RGLB=" ] || [ "$tag" == "RGPL=" ] || \
-          [ "$tag" == "RGPU=" ] || [ "$tag" == "RGSM=" ] || [ "$tag" == "RGCN=" ] || \
-          [ "$tag" == "RGDS=" ] || [ "$tag" == "RGDT=" ] || [ "$tag" == "RGPI=" ]
-       then
-         headerString+=",${field:0:4}"
-       else
-         # Redirect error message to stderr
-         echo "Invalid tag: '$tag'" >&2  
-         exit 1
-       fi
-     done
- 
-     # Ensures the required header information is present
-     if [ "$(echo "$headerString" | grep -c "RGID")" != 1 ] || \
-        [ "$(echo "$headerString" | grep -c "RGSM")" != 1 ] || \
-        [ "$(echo "$headerString" | grep -c "RGLB")" != 1 ] || \
-        [ "$(echo "$headerString" | grep -c "RGPU")" != 1 ]; then
-       echo "Missing required read-group information from header" >&2  
-       exit 1
-     fi
- 
-     echo "$headerString"
+```
+     python3 ~{parsingScript} -i ~{write_json(fastqInput)}
 ```
  
-### Format input CSV file for Dragen.
- 
-``` 
-     set -euo pipefail 
-     
-     echo ~{csvHeader} > ~{csvResult}
- 
-     # Load arrays into bash variables
-     arrRead1s=(~{sep=" " read1s})
-     if ~{isPaired}; then arrRead2s=(~{sep=" " read2s}); fi
-     arrReadGroups=(~{sep=" " readGroups})
-     
-     # Iterate over the arrays concurrently
-     for (( i = 0; i < ~{arrayLength}; i++ ))
-     do
-       read1="${arrRead1s[i]}"
-       if ~{isPaired}; then read2="${arrRead2s[i]}"; else read2=""; fi
-       readGroup=$(echo "${arrReadGroups[i]}" | sed 's/RG..=//g')
-       echo "$read1,$read2,$readGroup" >> ~{csvResult}
-     done
+### Compose a list of inputs for dragen:wq
+
 ```
- 
-### Align to reference using Dragen.
+    python3 ~{listWritingScript} -o ~{outputFileName} -l "~{sep=';' inputLines}"
+```
  
 ```
      set -euo pipefail
