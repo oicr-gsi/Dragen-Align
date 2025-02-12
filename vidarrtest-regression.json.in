@@ -27,7 +27,7 @@
                         },
                         "type": "EXTERNAL"
                     },
-                    "readGroup": "ID:121005_h804_0096_AD0V4NACXX-NoIndex_6 LB:PCSI0022C PL:ILLUMINA PU:121005_h804_0096_AD0V4NACXX-NoIndex_6 SM:PCSI0022C CM:OICR"
+                    "readGroup": "ID:121005_h804_0096_AD0V4NACXX_6_NoIndex LB:PCSI0022C PL:ILLUMINA PU:121005_h804_0096_AD0V4NACXX_6_NoIndex SM:PCSI0022C CN:OICR"
                 }
             ],
             "dragenAlign.outputFileNamePrefix": "121005_h804_0096_AD0V4NACXX_PCSI0022C_NoIndex_L006_001", 
@@ -36,10 +36,10 @@
             "dragenAlign.isRNA": false,
             "dragenAlign.extractInfoLine.jobMemory": null,
             "dragenAlign.extractInfoLine.modules": null,
-            "dragenAlign.extractInfoLine.parsingScript": null,
+            "dragenAlign.extractInfoLine.parsingScript": "/.mounts/labs/gsi/testdata/dragenSomatic/scripts/composeList.py",
             "dragenAlign.extractInfoLine.timeout": null,
             "dragenAlign.composeList.jobMemory": null,
-            "dragenAlign.composeList.listWritingScript": null,
+            "dragenAlign.composeList.listWritingScript": "/.mounts/labs/gsi/testdata/dragenSomatic/scripts/writeFile.py",
             "dragenAlign.composeList.modules": null,
             "dragenAlign.composeList.timeout": null,
             "dragenAlign.runDragen.adapter1File": null, 
@@ -124,7 +124,7 @@
                         },
                         "type": "EXTERNAL"
                     },
-                    "readGroup": "ID:121005_h804_0096_AD0V4NACXX-NoIndex_6 LB:PCSI0022C PL:ILLUMINA PU:121005_h804_0096_AD0V4NACXX-NoIndex_6 SM:PCSI0022C CM:OICR"
+                    "readGroup": "ID:121005_h804_0096_AD0V4NACXX_6_NoIndex LB:PCSI0022C PL:ILLUMINA PU:121005_h804_0096_AD0V4NACXX_6_NoIndex SM:PCSI0022C CN:OICR"
                 }
             ],
             "dragenAlign.outputFileNamePrefix": "121005_h804_0096_AD0V4NACXX_PCSI0022C_NoIndex_L006_001", 
@@ -133,10 +133,10 @@
             "dragenAlign.isRNA": false,
             "dragenAlign.extractInfoLine.jobMemory": null,
             "dragenAlign.extractInfoLine.modules": null,
-            "dragenAlign.extractInfoLine.parsingScript": null,
+            "dragenAlign.extractInfoLine.parsingScript": "/.mounts/labs/gsi/testdata/dragenSomatic/scripts/composeList.py",
             "dragenAlign.extractInfoLine.timeout": null,
             "dragenAlign.composeList.jobMemory": null,
-            "dragenAlign.composeList.listWritingScript": null,
+            "dragenAlign.composeList.listWritingScript": "/.mounts/labs/gsi/testdata/dragenSomatic/scripts/writeFile.py",
             "dragenAlign.composeList.modules": null,
             "dragenAlign.composeList.timeout": null,
             "dragenAlign.runDragen.adapter1File": null, 
@@ -210,7 +210,7 @@
                         "type": "EXTERNAL"
                     },
                     "fastqR2": null,
-                    "readGroup": "ID:121005_h804_0096_AD0V4NACXX-NoIndex_6 LB:PCSI0022C PL:ILLUMINA PU:121005_h804_0096_AD0V4NACXX-NoIndex_6 SM:PCSI0022C CM:OICR"
+                    "readGroup": "ID:121005_h804_0096_AD0V4NACXX_6_NoIndex LB:PCSI0022C PL:ILLUMINA PU:121005_h804_0096_AD0V4NACXX_6_NoIndex SM:PCSI0022C CN:OICR"
                 }
             ],
             "dragenAlign.outputFileNamePrefix": "121005_h804_0096_AD0V4NACXX_PCSI0022C_NoIndex_L006_001", 
@@ -219,10 +219,10 @@
             "dragenAlign.isRNA": false,
             "dragenAlign.extractInfoLine.jobMemory": null,
             "dragenAlign.extractInfoLine.modules": null,
-            "dragenAlign.extractInfoLine.parsingScript": null,
+            "dragenAlign.extractInfoLine.parsingScript": "/.mounts/labs/gsi/testdata/dragenSomatic/scripts/composeList.py",
             "dragenAlign.extractInfoLine.timeout": null,
             "dragenAlign.composeList.jobMemory": null,
-            "dragenAlign.composeList.listWritingScript": null,
+            "dragenAlign.composeList.listWritingScript": "/.mounts/labs/gsi/testdata/dragenSomatic/scripts/writeFile.py",
             "dragenAlign.composeList.modules": null,
             "dragenAlign.composeList.timeout": null,            
             "dragenAlign.runDragen.adapter1File": null, 
@@ -296,7 +296,7 @@
                         "type": "EXTERNAL"
                     },
                     "fastqR2": null,
-                    "readGroup": "ID:121005_h804_0096_AD0V4NACXX-NoIndex_6 LB:PCSI0022C PL:ILLUMINA PU:121005_h804_0096_AD0V4NACXX-NoIndex_6 SM:PCSI0022C CM:OICR"
+                    "readGroup": "ID:121005_h804_0096_AD0V4NACXX_6_NoIndex LB:PCSI0022C PL:ILLUMINA PU:121005_h804_0096_AD0V4NACXX_6_NoIndex SM:PCSI0022C CN:OICR"
                 }
             ],
             "dragenAlign.outputFileNamePrefix": "121005_h804_0096_AD0V4NACXX_PCSI0022C_NoIndex_L006_001", 
@@ -305,10 +305,10 @@
             "dragenAlign.isRNA": false,
             "dragenAlign.extractInfoLine.jobMemory": null,
             "dragenAlign.extractInfoLine.modules": null,
-            "dragenAlign.extractInfoLine.parsingScript": null,
+            "dragenAlign.extractInfoLine.parsingScript": "/.mounts/labs/gsi/testdata/dragenSomatic/scripts/composeList.py",
             "dragenAlign.extractInfoLine.timeout": null,
             "dragenAlign.composeList.jobMemory": null,
-            "dragenAlign.composeList.listWritingScript": null,
+            "dragenAlign.composeList.listWritingScript": "/.mounts/labs/gsi/testdata/dragenSomatic/scripts/writeFile.py",
             "dragenAlign.composeList.modules": null,
             "dragenAlign.composeList.timeout": null,            
             "dragenAlign.runDragen.adapter1File": null, 
@@ -393,7 +393,7 @@
                         },
                         "type": "EXTERNAL"
                     },
-                    "readGroup": "ID:121005_h804_0096_AD0V4NACXX_4_NoIndex PL:Illumina PU:121005_h804_0096_AD0V4NACXX_4_NoIndex LB:K562_1 SM:K562_1test CM:OICR"
+                    "readGroup": "ID:121005_h804_0096_AD0V4NACXX_4_NoIndex PL:Illumina PU:121005_h804_0096_AD0V4NACXX_4_NoIndex LB:K562_1 SM:K562_1test CN:OICR"
                 }
             ],
             "dragenAlign.outputFileNamePrefix": "K562", 
@@ -402,10 +402,10 @@
             "dragenAlign.isRNA": true,
             "dragenAlign.extractInfoLine.jobMemory": null,
             "dragenAlign.extractInfoLine.modules": null,
-            "dragenAlign.extractInfoLine.parsingScript": null,
+            "dragenAlign.extractInfoLine.parsingScript": "/.mounts/labs/gsi/testdata/dragenSomatic/scripts/composeList.py",
             "dragenAlign.extractInfoLine.timeout": null,
             "dragenAlign.composeList.jobMemory": null,
-            "dragenAlign.composeList.listWritingScript": null,
+            "dragenAlign.composeList.listWritingScript": "/.mounts/labs/gsi/testdata/dragenSomatic/scripts/writeFile.py",
             "dragenAlign.composeList.modules": null,
             "dragenAlign.composeList.timeout": null,            
             "dragenAlign.runDragen.adapter1File": null, 
@@ -490,7 +490,7 @@
                         },
                         "type": "EXTERNAL"
                     },
-                    "readGroup": "ID:121005_h804_0096_AD0V4NACXX_4_NoIndex PL:Illumina PU:121005_h804_0096_AD0V4NACXX_4_NoIndex LB:K562_1 SM:K562_1test CM:OICR"
+                    "readGroup": "ID:121005_h804_0096_AD0V4NACXX_4_NoIndex PL:Illumina PU:121005_h804_0096_AD0V4NACXX_4_NoIndex LB:K562_1 SM:K562_1test CN:OICR"
                 }
             ],
             "dragenAlign.outputFileNamePrefix": "K562", 
@@ -499,10 +499,10 @@
             "dragenAlign.isRNA": true,
             "dragenAlign.extractInfoLine.jobMemory": null,
             "dragenAlign.extractInfoLine.modules": null,
-            "dragenAlign.extractInfoLine.parsingScript": null,
+            "dragenAlign.extractInfoLine.parsingScript": "/.mounts/labs/gsi/testdata/dragenSomatic/scripts/composeList.py",
             "dragenAlign.extractInfoLine.timeout": null,
             "dragenAlign.composeList.jobMemory": null,
-            "dragenAlign.composeList.listWritingScript": null,
+            "dragenAlign.composeList.listWritingScript": "/.mounts/labs/gsi/testdata/dragenSomatic/scripts/writeFile.py",
             "dragenAlign.composeList.modules": null,
             "dragenAlign.composeList.timeout": null,            
             "dragenAlign.runDragen.adapter1File": null, 
@@ -576,7 +576,7 @@
                         "type": "EXTERNAL"
                     },
                     "fastqR2": null,
-                    "readGroup": "ID:121005_h804_0096_AD0V4NACXX_4_NoIndex PL:Illumina PU:121005_h804_0096_AD0V4NACXX_4_NoIndex LB:K562_1 SM:K562_1test CM:OICR"
+                    "readGroup": "ID:121005_h804_0096_AD0V4NACXX_4_NoIndex PL:Illumina PU:121005_h804_0096_AD0V4NACXX_4_NoIndex LB:K562_1 SM:K562_1test CN:OICR"
                 }
             ],
             "dragenAlign.outputFileNamePrefix": "K562", 
@@ -585,10 +585,10 @@
             "dragenAlign.isRNA": true,
             "dragenAlign.extractInfoLine.jobMemory": null,
             "dragenAlign.extractInfoLine.modules": null,
-            "dragenAlign.extractInfoLine.parsingScript": null,
+            "dragenAlign.extractInfoLine.parsingScript": "/.mounts/labs/gsi/testdata/dragenSomatic/scripts/composeList.py",
             "dragenAlign.extractInfoLine.timeout": null,
             "dragenAlign.composeList.jobMemory": null,
-            "dragenAlign.composeList.listWritingScript": null,
+            "dragenAlign.composeList.listWritingScript": "/.mounts/labs/gsi/testdata/dragenSomatic/scripts/writeFile.py",
             "dragenAlign.composeList.modules": null,
             "dragenAlign.composeList.timeout": null,            
             "dragenAlign.runDragen.adapter1File": null, 
@@ -662,7 +662,7 @@
                         "type": "EXTERNAL"
                     },
                     "fastqR2": null,
-                    "readGroup": "ID:VENHPV_0260_02_LB02-01_240304_A00469_0642_BHWVM7DSX7_3_TCCGCGAA-GCCTCTAT LB:VENHPV_A00469_0642_WT PL:ILLUMINA PU:VENHPV_0260_02_LB02-01_240304_A00469_0642_BHWVM7DSX7_3_TCCGCGAA-GCCTCTAT SM:VENHPV_TEST CM:OICR"
+                    "readGroup": "ID:VENHPV_0260_02_LB02-01_240304_A00469_0642_BHWVM7DSX7_3_TCCGCGAA-GCCTCTAT LB:VENHPV_A00469_0642_WT PL:ILLUMINA PU:VENHPV_0260_02_LB02-01_240304_A00469_0642_BHWVM7DSX7_3_TCCGCGAA-GCCTCTAT SM:VENHPV_TEST CN:OICR"
                 },
                 {
                     "fastqR1": {
@@ -678,7 +678,7 @@
                         "type": "EXTERNAL"
                     },
                     "fastqR2": null,
-                    "readGroup": "ID:VENHPV_0260_02_LB02-01_240223_A00469_0636_BHWTVJDSX7_1_TCCGCGAA-GCCTCTAT LB:VENHPV_A00469_0636_WT PL:ILLUMINA PU:VENHPV_0260_02_LB02-01_240223_A00469_0636_BHWTVJDSX7_1_TCCGCGAA-GCCTCTAT SM:VENHPV_TEST CM:OICR"
+                    "readGroup": "ID:VENHPV_0260_02_LB02-01_240223_A00469_0636_BHWTVJDSX7_1_TCCGCGAA-GCCTCTAT LB:VENHPV_A00469_0636_WT PL:ILLUMINA PU:VENHPV_0260_02_LB02-01_240223_A00469_0636_BHWTVJDSX7_1_TCCGCGAA-GCCTCTAT SM:VENHPV_TEST CN:OICR"
                 }
             ],
             "dragenAlign.outputFileNamePrefix": "VENHPV_0260_02_LB02-01", 
@@ -687,10 +687,10 @@
             "dragenAlign.isRNA": true,
             "dragenAlign.extractInfoLine.jobMemory": null,
             "dragenAlign.extractInfoLine.modules": null,
-            "dragenAlign.extractInfoLine.parsingScript": null,
+            "dragenAlign.extractInfoLine.parsingScript": "/.mounts/labs/gsi/testdata/dragenSomatic/scripts/composeList.py",
             "dragenAlign.extractInfoLine.timeout": null,
             "dragenAlign.composeList.jobMemory": null,
-            "dragenAlign.composeList.listWritingScript": null,
+            "dragenAlign.composeList.listWritingScript": "/.mounts/labs/gsi/testdata/dragenSomatic/scripts/writeFile.py",
             "dragenAlign.composeList.modules": null,
             "dragenAlign.composeList.timeout": null,
             "dragenAlign.runDragen.adapter1File": null, 
@@ -775,7 +775,7 @@
                         },
                         "type": "EXTERNAL"
                     },
-                    "readGroup": "ID:VENHPV_0260_02_LB02-01_240304_A00469_0642_BHWVM7DSX7_3_TCCGCGAA-GCCTCTAT LB:VENHPV_A00469_0642_WT PL:ILLUMINA PU:VENHPV_0260_02_LB02-01_240304_A00469_0642_BHWVM7DSX7_3_TCCGCGAA-GCCTCTAT SM:VENHPV_TEST CM:OICR"
+                    "readGroup": "ID:VENHPV_0260_02_LB02-01_240304_A00469_0642_BHWVM7DSX7_3_TCCGCGAA-GCCTCTAT LB:VENHPV_A00469_0642_WT PL:ILLUMINA PU:VENHPV_0260_02_LB02-01_240304_A00469_0642_BHWVM7DSX7_3_TCCGCGAA-GCCTCTAT SM:VENHPV_TEST CN:OICR"
                 },
                 {
                     "fastqR1": {
@@ -802,7 +802,7 @@
                         },
                         "type": "EXTERNAL"
                     },
-                    "readGroup": "ID:VENHPV_0260_02_LB02-01_240223_A00469_0636_BHWTVJDSX7_1_TCCGCGAA-GCCTCTAT LB:VENHPV_A00469_0636_WT PL:ILLUMINA PU:VENHPV_0260_02_LB02-01_240223_A00469_0636_BHWTVJDSX7_1_TCCGCGAA-GCCTCTAT SM:VENHPV_TEST CM:OICR"
+                    "readGroup": "ID:VENHPV_0260_02_LB02-01_240223_A00469_0636_BHWTVJDSX7_1_TCCGCGAA-GCCTCTAT LB:VENHPV_A00469_0636_WT PL:ILLUMINA PU:VENHPV_0260_02_LB02-01_240223_A00469_0636_BHWTVJDSX7_1_TCCGCGAA-GCCTCTAT SM:VENHPV_TEST CN:OICR"
                 }
             ],
             "dragenAlign.outputFileNamePrefix": "VENHPV_0260_02_LB02-01", 
@@ -811,10 +811,10 @@
             "dragenAlign.isRNA": true,
             "dragenAlign.extractInfoLine.jobMemory": null,
             "dragenAlign.extractInfoLine.modules": null,
-            "dragenAlign.extractInfoLine.parsingScript": null,
+            "dragenAlign.extractInfoLine.parsingScript": "/.mounts/labs/gsi/testdata/dragenSomatic/scripts/composeList.py",
             "dragenAlign.extractInfoLine.timeout": null,
             "dragenAlign.composeList.jobMemory": null,
-            "dragenAlign.composeList.listWritingScript": null,
+            "dragenAlign.composeList.listWritingScript": "/.mounts/labs/gsi/testdata/dragenSomatic/scripts/writeFile.py",
             "dragenAlign.composeList.modules": null,
             "dragenAlign.composeList.timeout": null,            
             "dragenAlign.runDragen.adapter1File": null, 
