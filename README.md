@@ -7,7 +7,7 @@ This workflow will align sequence data (WG or WT) provided as fastq files to the
 ## Dependencies
 
 * [dragen](https://developer.illumina.com/dragen)
-
+* [gsi modules : dragen-scripts 0.3](https://gitlab.oicr.on.ca/ResearchIT/modulator)
 
 ## Usage
 

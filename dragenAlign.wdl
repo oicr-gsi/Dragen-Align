@@ -84,6 +84,10 @@ workflow dragenAlign {
       {
         name: "dragen",
         url: "https://developer.illumina.com/dragen"
+      },
+      {
+        name: "gsi modules : dragen-scripts/0.3",
+        url: "https://gitlab.oicr.on.ca/ResearchIT/modulator"
       }
     ]
     output_meta: {
@@ -124,7 +128,7 @@ task extractInfoLine {
        String parsingScript = "$DRAGEN_SCRIPTS_ROOT/bin/composeList.py"
        Int timeout = 4
        Int jobMemory = 4
-       String modules = "dragen-scripts/0.2"
+       String modules = "dragen-scripts/0.3"
    }
 
    parameter_meta {
@@ -166,7 +170,7 @@ task composeList {
       String outputFileName
       Int jobMemory = 4
       Int timeout = 4
-      String modules = "dragen-scripts/0.2"
+      String modules = "dragen-scripts/0.3"
    }
 
    parameter_meta {
