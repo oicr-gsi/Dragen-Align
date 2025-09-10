@@ -475,6 +475,7 @@
                 }
             ],
             "dragenAlign.outputFileNamePrefix": "Test02",
+            "dragenAlign.reference": "hg38", 
             "dragenAlign.adapterTrim": null, 
             "dragenAlign.isRNA": true,
             "dragenAlign.headerFormat.jobMemory": null, 
