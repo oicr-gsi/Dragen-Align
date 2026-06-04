@@ -39,6 +39,10 @@ workflow dragenAlign {
     "hg38": {
       "referenceDirectory": "/.mounts/labs/gsiprojects/gsi/Dragen/reference/hg38fa.p12/",  # /staging/data/references/hg38-p12.v9
       "dragenVersion": "4.2.4"
+    },
+    "hg38_noAlt": {
+      "referenceDirectory": "/.mounts/labs/gsiprojects/gsi/Dragen/reference/hg38_noAlt-p12",
+      "dragenVersion": "4.2.4"
     }
   }
 

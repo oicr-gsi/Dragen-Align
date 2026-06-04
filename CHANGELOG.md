@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - 2026-06-04
+### Added
+[GRD-1175](https://jira.oicr.on.ca/browse/GRD-1175) - added hg38_noAlt support (Dragen.dev branch)
+
 ## [1.4.0] - 2025-02-12
 ### Changed
 - Regression testing adjusted, validates in Jenkins
