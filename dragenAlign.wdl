@@ -6,6 +6,11 @@ struct InputGroup {
   String readGroup
 }
 
+struct GenomeResources {
+    String referenceDirectory
+    String dragenVersion
+}
+
 workflow dragenAlign {
 
   input {
@@ -30,11 +35,19 @@ workflow dragenAlign {
     }
   }
   
-  Map[String,String] dragenRef_by_genome = { 
-    "hg38": "/staging/data/references/hg38-p12.v9"
+  Map[String,GenomeResources] dragenRef_by_genome = { 
+    "hg38": {
+      "referenceDirectory": "/.mounts/labs/gsiprojects/gsi/Dragen/reference/hg38fa.p12/",  # /staging/data/references/hg38-p12.v9
+      "dragenVersion": "4.2.4"
+    },
+    "hg38_noAlt": {
+      "referenceDirectory": "/.mounts/labs/gsiprojects/gsi/Dragen/reference/hg38_noAlt-p12",
+      "dragenVersion": "4.2.4"
+    }
   }
 
-  String dragenRef = dragenRef_by_genome[reference]
+  String dragenRef = dragenRef_by_genome[reference].referenceDirectory
+  String dragen_version = dragenRef_by_genome[ reference ].dragenVersion
   
   parameter_meta {
     inputGroups: "Array of fastq files to align using Dragen. Read-group information is required for fastq files, with the following fields being non-optional: RGID, RGSM, RGLB, RGPU. Each FASTQ file can only be referenced once."
@@ -44,26 +57,24 @@ workflow dragenAlign {
     isRNA: "Specifies whether to complete transcriptomic analysis, [false, genomic]"
   }
 
-  call headerFormat {
+  scatter(t in inputGroups) {
+    call extractInfoLine {
+      input:
+      fastqInput = object{fastqR1: t.fastqR1, fastqR2: t.fastqR2, readGroup: t.readGroup}
+    }
+  }
+
+  call composeList {
     input:
-    readGroupString = readGroups[0],
-    prefix = outputFileNamePrefix
+      inputLines = extractInfoLine.outputLine,
+      outputFileName = "dragen_inputs.csv"
   }
 
-  call makeCSV {  
+  call runDragen  {
     input: 
-    read1s = read1s,
-    read2s = read2s,
-    readGroups = readGroups,
-    isPaired = isPaired,
-    csvHeader = headerFormat.csvHeader,
-    prefix = outputFileNamePrefix
-  }
-
-  call runDragen  { 
-    input: 
-    csv = makeCSV.outCSV,
+    csv = composeList.inputList,
     dragenRef = dragenRef,
+    dragenVersion = dragen_version,
     adapterTrim = adapterTrim,
     prefix = outputFileNamePrefix,
     isRNA = isRNA
@@ -77,8 +88,30 @@ workflow dragenAlign {
       {
         name: "dragen",
         url: "https://developer.illumina.com/dragen"
+      },
+      {
+        name: "gsi modules : dragen-scripts/0.3",
+        url: "https://gitlab.oicr.on.ca/ResearchIT/modulator"
       }
     ]
+    output_meta: {
+        bam: {
+            description: "BAM file with alignments",
+            vidarr_label: "bam"
+        },
+        bamIndex: {
+            description: "index of BAM file with alignments",
+            vidarr_label: "bamIndex"
+        },
+        zippedOut: {
+            description: "Zipped .csv and .tab files (additional outputs)",
+            vidarr_label: "zippedOut"
+        },
+        outputChimeric: {
+            description: "Optional output file with chimeric junctions",
+            vidarr_label: "outputChimeric"
+        }
+   }
   }
 
   output {
@@ -90,141 +123,111 @@ workflow dragenAlign {
 
 }
 
-task headerFormat { 
-  input { 
-    String readGroupString
-    String prefix
-    Int jobMemory = 1
-    Int timeout = 5
-  }
+# =====================================================================
+# A scripted extraction of info from RG line to dragen-compliant string
+# =====================================================================
+task extractInfoLine {
+   input {
+       InputGroup fastqInput
+       String parsingScript = "$DRAGEN_SCRIPTS_ROOT/bin/composeList.py"
+       Int timeout = 4
+       Int jobMemory = 4
+       String modules = "dragen-scripts/0.3"
+   }
 
-  parameter_meta { 
-    readGroupString: "Read-group information of one of the fastq files" 
-    prefix: "Prefix for output files"
-    jobMemory: "Memory allocated for this job" 
-    timeout: "Hours before task timeout" 
-  } 
-  
-  command <<< 
-    set -euo pipefail 
+   parameter_meta {
+     fastqInput: "InputGroup struct entry with fastq files"
+     parsingScript: "Script for parsing inputs into a line"
+     timeout: "Timeout for the job"
+     jobMemory: "Job allocated RAM"
+     modules: "dependency modules"
+   }
 
-    headerString="Read1File,Read2File"
-    
-    # Split the string into an array of key-value pairs
-    IFS=, read -ra rgArray <<< ~{readGroupString}
+   command <<<
+    python3 ~{parsingScript} -i ~{write_json(fastqInput)}
+   >>>
 
-    # Adds valid keys (for Dragen) to headerString
-    for field in "${rgArray[@]}"; do
-      tag=${field:0:5}
-      if [ "$tag" == "RGID=" ] || [ "$tag" == "RGLB=" ] || [ "$tag" == "RGPL=" ] || \
-         [ "$tag" == "RGPU=" ] || [ "$tag" == "RGSM=" ] || [ "$tag" == "RGCN=" ] || \
-         [ "$tag" == "RGDS=" ] || [ "$tag" == "RGDT=" ] || [ "$tag" == "RGPI=" ]
-      then
-        headerString+=",${field:0:4}"
-      else
-        # Redirect error message to stderr
-        echo "Invalid tag: '$tag'" >&2  
-        exit 1
-      fi
-    done
+   runtime {
+     timeout: "~{timeout}"
+     modules: "~{modules}"
+     memory:  "~{jobMemory} GB"
+   }
 
-    # Ensures the required header information is present
-    if [ "$(echo "$headerString" | grep -c "RGID")" != 1 ] || \
-       [ "$(echo "$headerString" | grep -c "RGSM")" != 1 ] || \
-       [ "$(echo "$headerString" | grep -c "RGLB")" != 1 ] || \
-       [ "$(echo "$headerString" | grep -c "RGPU")" != 1 ]; then
-      echo "Missing required read-group information from header" >&2  
-      exit 1
-    fi
+   output {
+     String outputLine = read_string(stdout())
+   }
 
-    echo "$headerString"
-  >>> 
-
-  runtime { 
-    memory: "~{jobMemory} GB" 
-    timeout: "~{timeout}" 
-  } 
-
-  output { 
-    String csvHeader = read_string(stdout())
-  }
-
-  meta { 
-    output_meta: {
-    csvHeader: {
-        description: "Formatted header for the csv input of Dragen",
-        vidarr_label: "csvHeader"
-    }
-}
-  } 
-} 
-
-task makeCSV { 
-  input { 
-    Array[File] read1s
-    Array[File]? read2s
-    Array[String] readGroups
-    Boolean isPaired
-    String csvHeader
-    String prefix
-    Int jobMemory = 1
-    Int timeout = 5
-  }
-
-  parameter_meta { 
-    read1s: "Array of read 1 fastq files" 
-    read2s: "Array of read 2 fastq files. May be empty." 
-    readGroups: "Array of read-group information to be added into the bam file header" 
-    isPaired: "Identifies if paired-end sequencing, [true, paired]"
-    csvHeader: "Formatted header for the csv input of Dragen" 
-    prefix: "Prefix for output files"
-    jobMemory: "Memory allocated for this job" 
-    timeout: "Hours before task timeout" 
-  } 
-  
-  String csvResult = "~{prefix}_dragenInput.csv"
-  Int arrayLength = length(read1s)
-
-  command <<< 
-    set -euo pipefail 
-    
-    echo ~{csvHeader} > ~{csvResult}
-
-    # Load arrays into bash variables
-    arrRead1s=(~{sep=" " read1s})
-    if ~{isPaired}; then arrRead2s=(~{sep=" " read2s}); fi
-    arrReadGroups=(~{sep=" " readGroups})
-    
-    # Iterate over the arrays concurrently
-    for (( i = 0; i < ~{arrayLength}; i++ ))
-    do
-      read1="${arrRead1s[i]}"
-      if ~{isPaired}; then read2="${arrRead2s[i]}"; else read2=""; fi
-      readGroup=$(echo "${arrReadGroups[i]}" | sed 's/RG..=//g')
-      echo "$read1,$read2,$readGroup" >> ~{csvResult}
-    done
-  >>> 
-
-  runtime { 
-    memory: "~{jobMemory} GB" 
-    timeout: "~{timeout}" 
-  } 
-
-  output { 
-    File outCSV = "~{csvResult}"
-  }
-
-  meta { 
-    output_meta: { 
-      outCSV: "Formatted csv input for Dragen, containing fastq files and read-group information" 
-    } 
-  } 
+   meta {
+     output_meta: {
+       outputLine: "Output line to use in a list of fastq files in dragen-compliant format"
+     }
+   }
 }
 
+# =====================================================================
+#  Compose a dragen-compliant list of inputs to use with snv caller
+# =====================================================================
+task composeList {
+   input  {
+      Array[String] inputLines
+      String listWritingScript = "$DRAGEN_SCRIPTS_ROOT/bin/writeFile.py"
+      String outputFileName
+      Int jobMemory = 4
+      Int timeout = 4
+      String modules = "dragen-scripts/0.3"
+   }
+
+   parameter_meta {
+     inputLines: "Array of input lines to print"
+     listWritingScript: "Script for writing out list of inputs"
+     outputFileName: "Name of an output file, list of inputs"
+     jobMemory: "Job allocated RAM"
+     timeout: "Timeout for the job"
+     modules: "dependency modules"
+   }
+
+   command<<<
+   python3 ~{listWritingScript} -o ~{outputFileName} -l "~{sep=';' inputLines}"
+   >>>
+
+
+   runtime {
+      timeout: "~{timeout}"
+      modules: "~{modules}"
+      memory:  "~{jobMemory} GB"
+   }
+
+   output {
+     File inputList = "~{outputFileName}"
+   }
+
+   meta {
+     output_meta: {
+       inputList: "Output file to use with dragen SNV caller"
+     }
+   }
+}
+
+
+# ================================================================
+# Main task for generating SNV calls in somatic mode (DRAGEN mode)
+#
+# we need CSV files with a header and data lines organized as:
+#
+# RGID Read Group
+# RGSM Sample ID
+# RGLB Library
+# Lane Flow cell lane
+# Read1File - Full path to a valid FASTQ input file
+# Read2File - Full path to a valid FASTQ input file. Required for paired-end input. If not using paired-end input, leave empty.
+# Each FASTQ file can only be referenced once in the CSV list.
+# All values in the Read2File column must be reference valid files or must all be empty.
+# ================================================================
 task runDragen {
   input {
     File csv
     String dragenRef
+    String dragenVersion
     String prefix
     Boolean isRNA
     Boolean adapterTrim
@@ -237,6 +240,7 @@ task runDragen {
   parameter_meta {
     csv: "Formatted csv input for Dragen, containing fastq files and read-group information"
     dragenRef: "The reference genome to align the sample with by Dragen"
+    dragenVersion: "Expected version of dragen software on the DRAGEN node"
     prefix: "Prefix for output files"
     isRNA: "True/False, whether to complete transcriptomic analysis"
     adapterTrim: "True/False for adapter trimming"
@@ -275,6 +279,7 @@ task runDragen {
 
   runtime {
     timeout: "~{timeout}"
+    dragen_version: "~{dragenVersion}"
     backend: "DRAGEN"
   }
   
